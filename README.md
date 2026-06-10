@@ -1,0 +1,1 @@
+File tóm tắt dự án. Trong này, bạn cần thiết lập sẵn một bảng tự đánh giá điểm (Self-assessment table) theo mẫu và một báo cáo tóm tắt kiểm thử (Test summary report) bao gồm các số liệu thống kê như số test case, số bug, và link video demo (nếu có làm Agent Skill).

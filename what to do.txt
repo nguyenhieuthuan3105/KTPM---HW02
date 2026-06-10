@@ -23,7 +23,8 @@ FR-13: Dashboard (Trang chủ)
 Hiển thị tổng doanh thu: Chỉ tính tổng total_amount của các đơn có status = 'delivered'.
 Hiển thị tổng số đơn hàng.
 
-FR-20: Giỏ hàng (Shopping Cart) trên Mobile: Kiểm thử các thao tác vuốt, chạm, và cập nhật số lượng (Boundary Value cho số lượng min/max) trực tiếp trên màn hình cảm ứng.
+FR-20: Giỏ hàng (Shopping Cart) trên Mobile 
+Kiểm thử các thao tác vuốt, chạm, và cập nhật số lượng (Boundary Value cho số lượng min/max) trực tiếp trên màn hình cảm ứng.
 
 
 2. Thực hiện Testing bằng AI (Lặp lại cho cả 4 chức năng)
