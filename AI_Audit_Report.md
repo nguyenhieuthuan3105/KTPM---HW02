@@ -78,3 +78,41 @@ Xuất ra kết quả dưới dạng markdown mà tôi có thể thêm vào lậ
 ```text
 Thiết kế Test Case (Domain Testing)Dựa trên các miền giá trị đã phân tích, dưới đây là tập hợp các Test Case đại diện nhằm đảm bảo bao phủ toàn bộ các kịch bản kết quả (O1, O2, O3, O4) mà không gây ra bùng nổ tổ hợp:Test Case IDMục đích (Test Objective)Điều kiện tiền quyết (Precondition)Đầu vào (Email & Password)Trạng thái hệ thống (Failed Attempts)Kết quả mong đợi (Expected Result)TC_FR02_01Kiểm tra đăng nhập thành công ở trạng thái bình thường (Phủ: V1 + V2 + S1 -> O1)Tài khoản user@example.com đã tồn tại, pass: Abc@123Email: user@example.comPass: Abc@123S1: 0 lần saiĐăng nhập thành công, trả về JWT Token, bộ đếm giữ ở 0.TC_FR02_02Kiểm tra đăng nhập thành công sau khi hết thời gian phạt (Phủ: V1 + V2 + S3 -> O1)Tài khoản user@example.com đã tồn tại, pass: Abc@123Email: user@example.comPass: Abc@123S3: 3 lần sai, đã chờ > 30sĐăng nhập thành công, trả về JWT Token, reset bộ đếm về 0.TC_FR02_03Kiểm tra validation UI khi bỏ trống Email (Phủ: I1 -> O2)Hệ thống đang ở trang Đăng nhậpEmail: (bỏ trống)Pass: Abc@123S1: 0 lần saiFrontend chặn submit, hiển thị lỗi yêu cầu nhập Email.TC_FR02_04Kiểm tra validation UI khi Email sai định dạng (Phủ: I2 -> O2)Hệ thống đang ở trang Đăng nhậpEmail: userexample.comPass: Abc@123S1: 0 lần saiFrontend chặn submit, hiển thị lỗi định dạng HTML5 email.TC_FR02_05Kiểm tra validation UI khi bỏ trống Password (Phủ: I4 -> O2)Hệ thống đang ở trang Đăng nhậpEmail: user@example.comPass: (bỏ trống)S1: 0 lần saiFrontend chặn submit, hiển thị lỗi yêu cầu nhập Mật khẩu.TC_FR02_06Kiểm tra lỗi bảo mật khi Email chưa đăng ký (Phủ: I3 + S1 -> O3)Email new@example.com chưa có trong DBEmail: new@example.comPass: AnyPass123S1: 0 lần saiTrả về lỗi chung ("Email hoặc mật khẩu không đúng"), tăng bộ đếm lên 1.TC_FR02_07Kiểm tra lỗi bảo mật khi sai Password và đẩy lên giới hạn khóa (Phủ: V1 + I5 + S2 -> O3)Tài khoản user@example.com đã tồn tạiEmail: user@example.comPass: WrongPass!S2: 2 lần saiTrả về lỗi chung, tăng bộ đếm lên 3 (Tài khoản chính thức chuyển sang trạng thái tạm khóa).TC_FR02_08Kiểm tra từ chối đăng nhập khi tài khoản đang bị khóa, dù nhập đúng (Phủ: V1 + V2 + S4 -> O4)Tài khoản user@example.com đã tồn tạiEmail: user@example.comPass: Abc@123S4: 3 lần sai, thời gian < 30sTrả về thông báo tài khoản đang bị tạm khóa, không trả về JWT Token.TC_FR02_09Kiểm tra từ chối đăng nhập khi tài khoản đang bị khóa, nhập sai (Phủ: I3 + I5 + S4 -> O4)Bất kỳ email/pass nàoEmail: fake@example.comPass: FakePassS4: 3 lần sai, thời gian < 30s, Trả về thông báo tài khoản đang bị tạm khóa (hệ thống không check DB, ưu tiên check trạng thái lock trước).
 ```
+
+### [Prompt 3]
+
+- **Thời gian:** 19:30 10/06/2026
+- **Tool:** Gemini 3.1 Pro
+- **Prompt:**
+
+```text
+Chúng ta đã hoàn thành Domain Testing. Bây giờ, tôi muốn áp dụng kỹ thuật Boundary Value Analysis (BVA) cho chức năng FR-02. Dựa vào đặc tả, có 2 ranh giới (boundary) cần phân tích:
+Giới hạn số lần đăng nhập sai: Ngưỡng khóa tài khoản là 3 lần (n = 3).
+Giới hạn thời gian tạm khóa: Thời gian phạt là 30 giây (t = 30s).
+Nhiệm vụ của bạn:
+Bước 1 (Giải thích step-by-step): Hãy viết một đoạn ngắn giải thích cách phân tích các giá trị biên (min, max, just below, just above, on the boundary) cho 2 ranh giới trên. Ví dụ: Với n=3 thì các giá trị cần test là n=2, n=3, n=4.
+Bước 2 (Thiết kế Test Case): Thiết kế bảng Test Case BVA chi tiết để kiểm tra các giá trị biên này. Bảng phải có các cột: Test Case ID (bắt đầu là TC_FR02_BVA_01), Mục đích, Điều kiện tiền quyết, Đầu vào & Trạng thái (Inputs & State), và Kết quả mong đợi.
+Xin hãy trình bày bằng Markdown rõ ràng để tôi có thể đưa trực tiếp vào báo cáo.
+```
+
+- **AI Output:**
+
+```text
+Boundary Value Analysis (BVA)Bước 1: Phân tích các giá trị biên (Step-by-step Explanation)Để áp dụng kỹ thuật BVA cho FR-02 , tôi tập trung vào 2 ranh giới quyết định việc thay đổi trạng thái của hệ thống: số lần đăng nhập sai và thời gian tạm khóa tài khoản. Theo nguyên tắc của BVA, lỗi thường tiềm ẩn ở khu vực lân cận các ranh giới này.  1. Ranh giới số lần đăng nhập sai (Ngưỡng n = 3):  Just below the boundary (n = 2): Kiểm tra khi người dùng nhập sai lần thứ 2. Hệ thống phải ghi nhận lỗi nhưng tài khoản vẫn ở trạng thái hoạt động.  On the boundary (n = 3): Kiểm tra khi người dùng nhập sai ở đúng lần thứ 3. Đây là điểm trigger kích hoạt trạng thái tạm khóa.  Just above the boundary (n = 4): Kiểm tra khi người dùng tiếp tục gửi request đăng nhập lần thứ 4 (khi tài khoản vừa bị khóa). Hệ thống phải lập tức từ chối mà không cần kiểm tra DB.2. Ranh giới thời gian tạm khóa (Ngưỡng t = 30s):  Just below the boundary (t = 29s): Cố gắng thực hiện đăng nhập khi thời gian phạt chưa kết thúc (còn thiếu 1 giây). Hệ thống vẫn phải hiển thị lỗi bị khóa.On the boundary (t = 30s): Cố gắng thực hiện đăng nhập ngay tại thời điểm mốc phạt vừa chạm tới. Hệ thống phải cho phép xác thực (mở khóa tài khoản).Just above the boundary (t = 31s): Cố gắng đăng nhập khi thời gian phạt đã qua mức an toàn. Hệ thống phải tiếp nhận request bình thường.Bước 2: Thiết kế Test Case (BVA Testing)Dưới đây là các Test Case chi tiết để kiểm thử các giá trị biên đã phân tích:Test Case IDMục đích (Test Objective)Điều kiện tiền quyết (Precondition)Đầu vào & Trạng thái (Inputs & State)Kết quả mong đợi (Expected Result)TC_FR02_BVA_01Kiểm tra biên dưới số lần sai (n = 2)   Tài khoản hợp lệ, bộ đếm đang là 1Email: user@example.comPassword: WrongPassState: 1 lần saiHệ thống báo lỗi thông tin không đúng, tăng bộ đếm lên 2, tài khoản không bị khóa.TC_FR02_BVA_02Kiểm tra tại biên số lần sai (n = 3)   Tài khoản hợp lệ, bộ đếm đang là 2Email: user@example.comPassword: WrongPassState: 2 lần saiHệ thống báo lỗi tài khoản bị tạm khóa 30s, tăng bộ đếm lên 3.  TC_FR02_BVA_03Kiểm tra vượt biên số lần sai (n = 4)   Tài khoản vừa bị khóa, bộ đếm đang là 3Email: user@example.comPassword: AnyPassState: 3 lần saiHệ thống từ chối đăng nhập ngay lập tức, báo lỗi tài khoản đang bị tạm khóa.TC_FR02_BVA_04Kiểm tra biên dưới thời gian khóa (t = 29s)Tài khoản đang bị khóa, vừa trôi qua 29 giâyEmail: user@example.comPassword: CorrectPassState: 3 lần sai, t = 29sĐăng nhập thất bại, hệ thống báo lỗi tài khoản vẫn đang bị khóa.TC_FR02_BVA_05Kiểm tra tại biên thời gian khóa (t = 30s)   Tài khoản bị khóa, vừa trôi qua đúng 30 giâyEmail: user@example.comPassword: CorrectPassState: 3 lần sai, t = 30sĐăng nhập thành công, trả về JWT Token, reset bộ đếm số lần sai về 0.  TC_FR02_BVA_06Kiểm tra vượt biên thời gian khóa (t = 31s)Tài khoản bị khóa, đã trôi qua 31 giâyEmail: user@example.comPassword: CorrectPassState: 3 lần sai, t = 31sĐăng nhập thành công, trả về JWT Token, reset bộ đếm số lần sai về 0.
+```
+
+### [Prompt 4]
+
+- **Thời gian:** 21:30 09/06/2026
+- **Tool:** Gemini 3.1 Pro
+- **Prompt:**
+
+```text
+
+```
+
+- **AI Output:**
+
+```text
+
+```
