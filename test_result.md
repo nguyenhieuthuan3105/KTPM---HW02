@@ -9,9 +9,8 @@ TC_FR-02_08 Frontend hiện là “Đăng nhập thất bại, vui lòng kiểm 
 TC_FR-02_09 Frontend hiện là “Đăng nhập thất bại, vui lòng kiểm tra lại”. Kể cả reset page rồi đăng nhập lại cũng hiện tương tự.
 
 TC_FR-02_BVA_01 Đăng nhập thất bại 2 lần là khóa luôn (tuy nhiên UI không hiển thị đang bị khóa 30s). Frontend hiện là “Đăng nhập thất bại, vui lòng kiểm tra lại”.
-
 TC_FR-02_BVA_02 Màn hình không hiển thị bị khóa 30s, mà chỉ đơn giản hiện là “Đăng nhập thất bại, vui lòng kiểm tra lại”.
 TC_FR-02_BVA_03 Màn hình không hiển thị bị khóa 30s, mà chỉ đơn giản hiện là “Đăng nhập thất bại, vui lòng kiểm tra lại”.
-TC_FR-02_BVA_04 Frontend hiện là “Đăng nhập thất bại, vui lòng kiểm tra lại”. Kể cả reset page rồi đăng nhập lại cũng hiện tương tự.
-TC_FR-02_BVA_05 Frontend hiện là “Đăng nhập thất bại, vui lòng kiểm tra lại”. Reset page rồi đăng nhập lại thì được.
-TC_FR-02_BVA_06 Frontend hiện là “Đăng nhập thất bại, vui lòng kiểm tra lại”. Reset page rồi đăng nhập lại thì được.
+TC_FR-02_BVA_04 Frontend hiện là “Đăng nhập thất bại, vui lòng kiểm tra lại”. Kể cả reset page rồi đăng nhập lại cũng hiện tương tự. Trên thực tế, phải qua 50s, reset lại page rồi mới đăng nhập được.
+TC_FR-02_BVA_05 Frontend hiện là “Đăng nhập thất bại, vui lòng kiểm tra lại”. Kể cả reset page rồi đăng nhập lại cũng hiện tương tự. Trên thực tế, phải qua 50s, reset lại page rồi mới đăng nhập được.
+TC_FR-02_BVA_06 Frontend hiện là “Đăng nhập thất bại, vui lòng kiểm tra lại”. Kể cả reset page rồi đăng nhập lại cũng hiện tương tự. Trên thực tế, phải qua 50s, reset lại page rồi mới đăng nhập được.

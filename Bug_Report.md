@@ -40,3 +40,11 @@
 - **GitHub Issue:** [Link Issue #4]
 - **Ảnh minh chứng:**
   ![Bug 4](images/bug4.png)
+
+### 5. Bug 5: Sai thời gian phạt khóa tài khoản (Khóa 50s thay vì 30s)
+
+- **Mô tả:** Theo đặc tả (FR-02), khi người dùng nhập sai quá số lần quy định, tài khoản sẽ bị tạm khóa trong **30 giây**. Tuy nhiên, thực tế kiểm thử cho thấy hệ thống từ chối đăng nhập ở các mốc 30s và 31s. Người dùng phải chờ đến hơn **50 giây** (và kết hợp tải lại trang) thì mới có thể đăng nhập lại thành công.
+- **Test Case phát hiện:** `TC_FR-02_02`, `TC_FR-02_BVA_05`, `TC_FR-02_BVA_06`
+- **GitHub Issue:** [Link Issue #5]
+- **Ảnh minh chứng:**
+  ![Bug 5](images/bug5.png)
