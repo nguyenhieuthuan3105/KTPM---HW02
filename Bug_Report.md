@@ -48,3 +48,51 @@
 - **GitHub Issue:** [Link Issue #5]
 - **Ảnh minh chứng:**
   ![Bug 5](images/bug5.png)
+
+### 6. Bug 6: Không tự động xóa giỏ hàng sau khi thanh toán thành công
+
+- **Mô tả:** Theo đặc tả, sau khi thanh toán thành công thì giỏ hàng phải được xóa. Tuy nhiên, thực tế sau khi thanh toán, nếu người dùng bấm lại vào Giỏ hàng thì các sản phẩm cũ vẫn còn nguyên. Người dùng thậm chí có thể thanh toán tiếp các món đồ này. Hệ thống chỉ thực sự xóa giỏ hàng nếu người dùng tự tải lại trang (reload/F5).
+- **Test Case phát hiện:** `TC_FR-08_01`
+- **GitHub Issue:** [Link Issue #6]
+- **Ảnh minh chứng:**
+  ![Bug 6](images/bug6.png)
+
+### 7. Bug 7: Lỗ hổng bảo mật cho phép thanh toán đơn hàng với giá 0 VNĐ
+
+- **Mô tả:** Backend không thực hiện tính toán lại hoặc xác thực giá trị `total_amount` do Client gửi lên. Khi can thiệp sửa tổng tiền thành 0 trên UI (hoặc qua API), hệ thống vẫn chấp nhận và tạo đơn hàng thành công với tổng tiền 0đ.
+- **Test Case phát hiện:** `TC_FR-08_02`
+- **GitHub Issue:** [Link Issue #7]
+- **Ảnh minh chứng:**
+  ![Bug 7](images/bug7.png)
+
+### 8. Bug 8: Lỗ hổng bảo mật cho phép thanh toán đơn hàng với giá trị âm
+
+- **Mô tả:** Tương tự Bug 7, Backend thiếu validation hoàn toàn đối với trường `total_amount`. Người dùng có thể chỉnh sửa tổng tiền thành số âm (VD: -10đ) và hệ thống vẫn ghi nhận thanh toán thành công với đơn giá âm.
+- **Test Case phát hiện:** `TC_FR-08_03`
+- **GitHub Issue:** [Link Issue #8]
+- **Ảnh minh chứng:**
+  ![Bug 8](images/bug8.png)
+
+### 9. Bug 9: Lỗi cho phép thanh toán đơn hàng rỗng (Empty Cart)
+
+- **Mô tả:** Sau khi ở trang thanh toán, nếu tải lại trang, danh sách sản phẩm biến mất (giỏ hàng rỗng) nhưng form thanh toán vẫn hiển thị với tổng tiền bằng 1 (hoặc 0). Nếu người dùng tiếp tục bấm thanh toán, hệ thống vẫn chấp nhận và tạo ra một đơn hàng "bóng ma" không có sản phẩm.
+- **Test Case phát hiện:** `TC_FR-08_04`
+- **GitHub Issue:** [Link Issue #9]
+- **Ảnh minh chứng:**
+  ![Bug 9](images/bug9.png)
+
+### 10. Bug 10: Lỗi cấu hình CORS Policy khi gọi API không có Token
+
+- **Mô tả:** Khi gọi API Checkout (`POST /api/checkout`) mà xóa bỏ Header `Authorization`, thay vì trả về HTTP Status `401 Unauthorized` để Frontend xử lý, Backend lại gây ra lỗi sập luồng khiến trình duyệt văng lỗi CORS (Cross-Origin Resource Sharing) policy và `net::ERR_FAILED`.
+- **Test Case phát hiện:** `TC_FR-08_07`
+- **GitHub Issue:** [Link Issue #10]
+- **Ảnh minh chứng:**
+  ![Bug 10](images/bug10.png)
+
+### 11. Bug 11: Lỗi cấu hình CORS Policy khi Token không hợp lệ
+
+- **Mô tả:** Tương tự Bug 10, khi gửi request với Token bị cố tình chỉnh sửa sai chữ ký (không hợp lệ/hết hạn), Backend không trả về lỗi 401 mà tiếp tục gây ra lỗi CORS khiến trình duyệt chặn hoàn toàn request.
+- **Test Case phát hiện:** `TC_FR-08_08`
+- **GitHub Issue:** [Link Issue #11]
+- **Ảnh minh chứng:**
+  ![Bug 11](images/bug11.png)

@@ -147,7 +147,40 @@ vay hay thiet ke lai file Bug_report cho phu hop nhe, luu y tra ve format markdo
   ![Bug 4](images/bug4.png)
 ```
 
-### [Prompt 5]
+## FR-08: Thanh toán (Checkout)
+
+### [Prompt 1]
+
+- **Thời gian:** 9:30 16/06/2026
+- **Tool:** Gemini 3.1 Pro
+- **Prompt:**
+
+```text
+Đóng vai trò là một Software Tester chuyên nghiệp. Tôi cần áp dụng kỹ thuật Domain Testing cho chức năng FR-08: Thanh toán (Checkout).
+Mục tiêu của tôi là tạo ra một bộ Test Case bao phủ tối đa các kịch bản ngoại lệ, đặc biệt là các lỗi bảo mật (tampering) để phát hiện càng nhiều bug càng tốt. Dưới đây là đặc tả hệ thống:
+Chỉ người dùng đã đăng nhập mới tiến hành thanh toán được.
+Tổng tiền thanh toán được tính tự động từ giỏ hàng và không cho phép người dùng chỉnh sửa trực tiếp trên UI.
+Giao diện hiển thị đầy đủ danh sách sản phẩm đặt mua.
+Backend phải tự tính lại tổng tiền; không chấp nhận giá trị total_amount do client gửi lên.
+Sau thanh toán thành công, giỏ hàng được xóa.
+Nhiệm vụ của bạn gồm 2 phần, hãy trình bày hoàn toàn bằng Markdown để tôi đưa vào báo cáo:
+Phần 1: Phân tích Domain (Step-by-step Explanation)
+Hãy phân tích rõ các miền giá trị (Hợp lệ / Không hợp lệ) cho các biến ẩn và biến trạng thái sau:
+Biến trạng thái đăng nhập (Auth Token).
+Biến trạng thái Giỏ hàng (Số lượng món, Tồn kho sản phẩm trước khi checkout).
+Biến đầu vào Payload API (Giá trị total_amount client gửi lên so với thực tế).
+Phần 2: Thiết kế Bảng Test Case
+Từ phân tích trên, hãy sinh ra một bộ Test Case chi tiết. Kết hợp các miền giá trị để tạo ra cả Happy Path và rất nhiều Negative/Edge Cases (Ví dụ: Dùng Postman/Burp Suite để sửa total_amount thành 0, số âm; Giỏ hàng trống nhưng vẫn gọi API; Sản phẩm bị xóa/hết hàng ngay lúc bấm thanh toán; Token hết hạn...).
+Bảng gồm các cột: Test Case ID (Bắt đầu là TC_FR-08_01), Tên (Test Objective), Điều kiện tiền quyết, Đầu vào & Trạng thái, Kết quả mong đợi.
+```
+
+- **AI Output:**
+
+```text
+FR-08: Thanh toán (Checkout)Domain TestingĐể thực hiện Domain Testing cho FR-08, tôi không chỉ kiểm tra các thao tác trên giao diện UI (nơi người dùng bị giới hạn) mà tập trung phân tích các biến trạng thái ẩn và dữ liệu Payload API gửi từ Client lên Backend. Mục tiêu là phát hiện các lỗ hổng bảo mật (Data Tampering) và lỗi logic đồng bộ (Race Condition).  Phần 1: Phân tích Miền giá trị (Domain Analysis)Chức năng Thanh toán phụ thuộc vào 3 nhóm biến trạng thái và đầu vào cốt lõi:1. Biến trạng thái đăng nhập: Auth Token (Header Authorization)Trạng thái này quyết định quyền truy cập vào API thanh toán.Miền hợp lệ (Valid Domains):V1: Token tồn tại, chuẩn định dạng JWT, đúng chữ ký (Signature) và còn thời hạn sử dụng.Miền không hợp lệ (Invalid Domains):I1 (Missing): Không gửi kèm Token trong Header.I2 (Expired): Token hợp lệ nhưng đã hết hạn (Expired).I3 (Tampered/Invalid): Token bị chỉnh sửa nội dung (sai chữ ký) hoặc là token fake.2. Biến trạng thái Giỏ hàng (Cart State & Inventory)Trạng thái này kiểm tra tính hợp lệ của dữ liệu đầu vào trước khi lập đơn hàng.Miền hợp lệ (Valid Domains):V2: Giỏ hàng có ít nhất 1 sản phẩm ($N \ge 1$) VÀ Số lượng đặt mua của từng món $\le$ Số lượng tồn kho thực tế trong DB.Miền không hợp lệ (Invalid Domains):I4 (Empty Cart): Giỏ hàng trống ($N = 0$) nhưng Client vẫn cố tình gọi API Checkout.I5 (Out of Stock): Tồn kho hiện tại trong DB $<$ Số lượng khách đặt mua (Thường xảy ra do Race Condition: khách A thêm vào giỏ, khách B mua hết, sau đó khách A mới bấm thanh toán).I6 (Deleted Product): Sản phẩm trong giỏ đã bị Admin xóa hoặc vô hiệu hóa khỏi hệ thống trước khi thanh toán.3. Biến đầu vào Payload API: total_amount (Client vs Backend)Theo đặc tả, Backend KHÔNG ĐƯỢC tin tưởng giá trị total_amount từ Client gửi lên mà phải tự tính toán lại.Miền hợp lệ (Valid Domains):V3: Giá trị total_amount Client gửi khớp 100% với tổng tiền Backend tự tính dựa trên DB. (Hoặc Payload không gửi trường này, để Backend tự lo).Miền không hợp lệ (Invalid Domains / Tampering):I7 (Zero/Negative): Cố tình sửa payload total_amount = 0 hoặc số âm (VD: -50000).I8 (Fractional/Low): Cố tình sửa total_amount thành một số rất nhỏ (VD: 1 VNĐ).I9 (Overpriced): Cố tình sửa total_amount thành số lớn hơn thực tế (kiểm tra xem Backend có validate hay ghi nhận sai doanh thu không).Phần 2: Thiết kế Test Case (Domain Testing)Dựa trên phân tích trên, dưới đây là bộ Test Case kết hợp kỹ thuật chặn bắt Request (Intercept) qua Postman/Burp Suite để kiểm tra độ tin cậy của API:Test Case IDTên (Test Objective)Điều kiện tiền quyết (Precondition)Đầu vào & Trạng thái (Inputs & State)Kết quả mong đợi (Expected Result)TC_FR-08_01Kiểm tra thanh toán thành công (Happy Path) (Phủ: V1 + V2 + V3)User đã đăng nhập, giỏ hàng có 2 SP (Tổng 500k), tồn kho đủ.Auth: JWT hợp lệCart: 2 SP hợp lệPayload: total_amount = 500.000Thanh toán thành công. Backend tính đúng 500k. Trả về mã đơn hàng. Sau đó giỏ hàng tự động bị xóa (trống).TC_FR-08_02Kiểm tra bảo mật: Sửa tổng tiền thành 0 hoặc 1 VNĐ (Phủ: V1 + V2 + I7/I8)User đã đăng nhập, giỏ hàng có SP trị giá 500k.Dùng Postman gửi request.Payload: total_amount = 1 (hoặc 0)Backend bỏ qua giá trị 1đ của Client, tự động tính lại tổng tiền là 500k để lập đơn hàng (HOẶC trả về lỗi 400 Data Mismatch). Không được tạo đơn giá 1đ.TC_FR-08_03Kiểm tra bảo mật: Sửa tổng tiền thành số âm (Phủ: V1 + V2 + I7)User đã đăng nhập, giỏ hàng có SP trị giá 500k.Dùng Postman gửi request.Payload: total_amount = -50000Backend từ chối xử lý, báo lỗi 400 Bad Request (Invalid Amount), HOẶC tự động sửa lại thành 500k đúng giá trị thực.TC_FR-08_04Kiểm tra bảo mật API: Giỏ hàng trống nhưng vẫn gọi API Checkout (Phủ: V1 + I4)User đã đăng nhập. Giỏ hàng hiện tại đang trống (0 SP).Dùng Postman gọi thẳng API Checkout.Cart: $N = 0$Backend chặn lại, trả về lỗi 400 (Giỏ hàng trống, không thể lập đơn). Không tạo ra đơn hàng rỗng.TC_FR-08_05Kiểm tra Race Condition: Hết hàng ngay lúc bấm thanh toán (Phủ: V1 + I5)User có SP A trong giỏ. (Admin vừa vào DB set tồn kho SP A = 0).Bấm nút Checkout trên UI.Cart: Số lượng đặt > Tồn khoThanh toán thất bại. Trả về thông báo lỗi: "Sản phẩm A đã hết hàng hoặc không đủ số lượng".TC_FR-08_06Kiểm tra Race Condition: Sản phẩm bị xóa trước khi thanh toán (Phủ: V1 + I6)User có SP B trong giỏ. (Admin vừa vào DB xóa SP B).Bấm nút Checkout trên UI.Cart: SP không tồn tại trong DBThanh toán thất bại. Trả về thông báo lỗi: "Sản phẩm B không còn tồn tại".TC_FR-08_07Kiểm tra quyền truy cập: Gọi API không có Token (Phủ: I1)Giỏ hàng có SP.Dùng Postman xóa header Authorization.Backend từ chối truy cập, trả về lỗi 401 Unauthorized.TC_FR-08_08Kiểm tra quyền truy cập: Token đã hết hạn (Phủ: I2)Giỏ hàng có SP. User đăng nhập từ hôm qua (Token đã hết hạn).Bấm nút Checkout trên UI.Auth: Expired JWTBackend từ chối truy cập (401). Frontend tự động redirect về trang Đăng nhập.
+```
+
+### [Prompt 2]
 
 - **Thời gian:** 21:30 09/06/2026
 - **Tool:** Gemini 3.1 Pro
