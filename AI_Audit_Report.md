@@ -182,6 +182,32 @@ FR-08: Thanh toán (Checkout)Domain TestingĐể thực hiện Domain Testing ch
 
 ### [Prompt 2]
 
+- **Thời gian:** 15:00 22/06/2026
+- **Tool:** Gemini 3.1 Pro
+- **Prompt:**
+
+```text
+Chúng ta đã hoàn thành Domain Testing. Bây giờ, tôi muốn áp dụng kỹ thuật Boundary Value Analysis (BVA) cho chức năng FR-08: Thanh toán (Checkout).
+LƯU Ý CỰC KỲ QUAN TRỌNG (Để tránh Hallucination): > 1. Hệ thống SUT này HOÀN TOÀN KHÔNG CÓ cơ chế quản lý tồn kho (stock). Tuyệt đối không sinh ra các test case liên quan đến việc kiểm tra số lượng tồn kho hay "hết hàng".
+2. Hãy sử dụng mock data này cho tất cả test case: Sản phẩm "iPhone 15 Pro Max", Giá: 30.000.000 VNĐ.
+Dựa vào đặc tả và quan sát UI (không chặn độ dài input số lượng), có 2 ranh giới (boundary) cần phân tích ở API Checkout:
+
+Giới hạn tối thiểu của Giỏ hàng (N - Số lượng sản phẩm): >    - Ranh giới là N = 1 (Số lượng mua tối thiểu để thanh toán).
+Giới hạn lưu trữ tổng tiền (Total Amount - Integer Overflow):
+Ranh giới là giới hạn tối đa của kiểu dữ liệu số nguyên 32-bit (Max Int = 2.147.483.647).
+Vì 1 sản phẩm giá 30.000.000 VNĐ, nếu người dùng mua số lượng cực lớn (VD: N = 72 chiếc thì tổng tiền là 2.160.000.000, vượt qua mốc Max Int).
+Nhiệm vụ của bạn:Bước 1 (Giải thích step-by-step): Hãy viết một đoạn ngắn giải thích cách phân tích các giá trị biên (min, max, just below, just above, on the boundary) cho 2 ranh giới trên. Ví dụ: Với N=1 thì test N=0, N=1. Với Max Int, test giá trị mấp mé giới hạn và giá trị vượt giới hạn để xem Backend có bị crash không.Bước 2 (Thiết kế Test Case): Thiết kế bảng Test Case BVA chi tiết để kiểm tra các giá trị biên này. Bảng phải có các cột: Test Case ID (bắt đầu là TC_FR-08_BVA_01), Tên (Test Objective), Điều kiện tiền quyết, Đầu vào & Trạng thái (Inputs & State), và Kết quả mong đợi.
+Xin hãy trình bày bằng Markdown rõ ràng để tôi có thể đưa trực tiếp vào báo cáo.
+```
+
+- **AI Output:**
+
+```text
+Dưới đây là phần trình bày chi tiết cho kỹ thuật Boundary Value Analysis (BVA) của chức năng FR-08: Thanh toán (Checkout), được thiết kế đặc biệt để bắt các lỗi logic và tràn bộ nhớ do không giới hạn input. Bạn có thể copy toàn bộ đoạn Markdown này dán trực tiếp vào file Main_Report.md.Boundary Value Analysis (BVA)Bước 1: Phân tích các giá trị biên (Step-by-step Explanation)Dựa trên đặc tả hệ thống và việc giao diện UI không chặn độ dài của trường "Số lượng" (N), tôi tập trung phân tích 2 ranh giới cực độ có khả năng gây lỗi (Crash hoặc tạo đơn hàng ảo) tại API Checkout. Do hệ thống không quản lý tồn kho, mọi số lượng N > 0 đều được coi là hợp lệ về mặt logic nghiệp vụ, đẩy toàn bộ rủi ro về phía xử lý kiểu dữ liệu của Backend.1. Ranh giới giới hạn tối thiểu của Giỏ hàng (Ngưỡng N = 1):Just below the boundary (N = 0): Kiểm tra khi người dùng cố tình nhập số lượng là 0. Hệ thống phải từ chối thanh toán (tương đương giỏ hàng rỗng hoặc số lượng không hợp lệ).On the boundary (N = 1): Kiểm tra khi người dùng mua đúng 1 sản phẩm. Đây là mốc hợp lệ tối thiểu, hệ thống phải xử lý thành công.Just above the boundary (N = 2): Kiểm tra khi người dùng mua 2 sản phẩm, hệ thống phải xử lý tính toán tổng tiền chính xác và thanh toán thành công.2. Ranh giới giới hạn lưu trữ tổng tiền (Integer Overflow - Ngưỡng Max Int 32-bit):Với kiểu dữ liệu số nguyên 32-bit có dấu, giá trị lớn nhất lưu trữ được là 2.147.483.647. Sản phẩm "iPhone 15 Pro Max" có giá 30.000.000 VNĐ. Ta phân tích quanh ranh giới gây tràn số:Just below the boundary (N = 71): Tổng tiền là 71 * 30.000.000 = 2.130.000.000 VNĐ (Nằm sát dưới mức Max Int). Hệ thống vẫn phải xử lý thành công mà không bị sai lệch số liệu.Just above the boundary / On Overflow (N = 72): Tổng tiền là 72 * 30.000.000 = 2.160.000.000 VNĐ (Vượt mức Max Int). Việc truyền giá trị này có thể khiến Backend bị crash, lưu sai dữ liệu (biến thành số âm), hoặc báo lỗi Server (500). Kỳ vọng đúng là hệ thống sử dụng kiểu dữ liệu lớn hơn (như 64-bit/BigInt) hoặc có Validation bắt lỗi "Số tiền vượt quá giới hạn" một cách gọn gàng (Graceful error handling).Bước 2: Thiết kế Test Case (BVA Testing)Dưới đây là các Test Case chi tiết sử dụng mock data "iPhone 15 Pro Max" (30.000.000 VNĐ) để kiểm thử các giá trị biên:Test Case IDTên (Test Objective)Điều kiện tiền quyết (Precondition)Đầu vào & Trạng thái (Inputs & State)Kết quả mong đợi (Expected Result)TC_FR-08_BVA_01Kiểm tra biên dưới số lượng tối thiểu (N = 0)User đã đăng nhập, giỏ hàng có "iPhone 15 Pro Max"Sản phẩm: iPhone 15 Pro MaxSố lượng (N): 0Payload: total_amount = 0Backend từ chối request, trả về lỗi 400 (Số lượng sản phẩm không hợp lệ hoặc giỏ hàng trống). Không tạo đơn hàng.TC_FR-08_BVA_02Kiểm tra tại biên số lượng tối thiểu (N = 1)User đã đăng nhập, giỏ hàng có "iPhone 15 Pro Max"Sản phẩm: iPhone 15 Pro MaxSố lượng (N): 1Payload: total_amount = 30.000.000Thanh toán thành công, tạo đơn hàng với tổng tiền chính xác là 30.000.000 VNĐ.TC_FR-08_BVA_03Kiểm tra vượt biên số lượng tối thiểu (N = 2)User đã đăng nhập, giỏ hàng có "iPhone 15 Pro Max"Sản phẩm: iPhone 15 Pro MaxSố lượng (N): 2Payload: total_amount = 60.000.000Thanh toán thành công, tạo đơn hàng với tổng tiền chính xác là 60.000.000 VNĐ.TC_FR-08_BVA_04Kiểm tra biên dưới giới hạn Integer 32-bit (N = 71)User đã đăng nhập, giỏ hàng có "iPhone 15 Pro Max"Sản phẩm: iPhone 15 Pro MaxSố lượng (N): 71Payload: total_amount = 2.130.000.000Thanh toán thành công, tạo đơn hàng với tổng tiền chính xác là 2.130.000.000 VNĐ. Backend không bị lỗi số học.TC_FR-08_BVA_05Kiểm tra vượt biên giới hạn Integer 32-bit (N = 72) - Gây tràn sốUser đã đăng nhập, giỏ hàng có "iPhone 15 Pro Max"Sản phẩm: iPhone 15 Pro MaxSố lượng (N): 72Payload: total_amount = 2.160.000.000Hệ thống xử lý an toàn: Có thể tạo đơn hàng thành công (nếu hỗ trợ BigInt/64-bit) HOẶC chặn request báo lỗi "Giá trị vượt giới hạn". Tuyệt đối không crash server (500) hoặc tạo đơn hàng với tổng tiền âm.
+```
+
+### [Prompt 2]
+
 - **Thời gian:** 21:30 09/06/2026
 - **Tool:** Gemini 3.1 Pro
 - **Prompt:**

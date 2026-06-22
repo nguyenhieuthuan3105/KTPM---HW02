@@ -96,3 +96,11 @@
 - **GitHub Issue:** [Link Issue #11]
 - **Ảnh minh chứng:**
   ![Bug 11](images/bug11.png)
+
+### 12. Bug 12: Lỗ hổng logic cho phép thanh toán sản phẩm với số lượng bằng 0
+
+- **Mô tả:** Mặc dù số lượng sản phẩm đặt mua là 0 (không hợp lệ về mặt logic thương mại), hệ thống Backend vẫn không có cơ chế validation để chặn lại. Người dùng có thể điều chỉnh số lượng thành 0 và tiến hành thanh toán, hệ thống vẫn ghi nhận tạo đơn hàng thành công. _(Lưu ý: Khác với Bug 9 là gọi API với giỏ hàng rỗng hoàn toàn, lỗi này xảy ra khi giỏ hàng có tồn tại dữ liệu sản phẩm nhưng trường `quantity` của sản phẩm đó bằng 0)._
+- **Test Case phát hiện:** `TC_FR-08_BVA_01`
+- **GitHub Issue:** [Link Issue #12]
+- **Ảnh minh chứng:**
+  ![Bug 12](images/bug12.png)
