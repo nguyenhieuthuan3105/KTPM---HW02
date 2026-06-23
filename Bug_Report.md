@@ -104,3 +104,11 @@
 - **GitHub Issue:** [Link Issue #12]
 - **Ảnh minh chứng:**
   ![Bug 12](images/bug12.png)
+
+### 13. Bug 13: Lỗi logic tính toán sai (nhân đôi x2) Tổng doanh thu trên Dashboard
+
+- **Mô tả:** Theo đặc tả của FR-13, hệ thống chỉ tính tổng `total_amount` của các đơn có `status = 'delivered'`. Tuy nhiên, hệ thống hiện đang bị lỗi logic trong quá trình cộng dồn dữ liệu (có thể do lỗi câu truy vấn SQL JOIN hoặc lỗi vòng lặp). Kết quả là giá trị doanh thu hiển thị trên giao diện Dashboard luôn luôn bị nhân đôi (x2) so với tổng số tiền thực tế của các đơn hàng thành công trong Database. Phép tính số âm vẫn hoạt động nhưng cũng bị nhân đôi.
+- **Test Case phát hiện:** `TC_FR-13_02`, `TC_FR-13_04`, `TC_FR-13_06`
+- **GitHub Issue:** [Link Issue #13]
+- **Ảnh minh chứng:**
+  ![Bug 13](images/bug13.png)

@@ -34,3 +34,12 @@ TC_FR-08_BVA_02 Hệ thống hiển thị thanh toán thành công với giá ti
 TC_FR-08_BVA_03 Hệ thống hiển thị thanh toán thành công với giá tiền chính xác.
 TC_FR-08_BVA_04 Hệ thống hiển thị thanh toán thành công với giá tiền chính xác.
 TC_FR-08_BVA_05 Hệ thống hiển thị thanh toán thành công với giá tiền chính xác.
+
+# FR-13
+
+TC_FR-13_01 Dashboard hiển thị tổng số đơn hàng bằng 0 Và tổng doanh thu bằng 0. Pass
+TC_FR-13_02 Dashboard hiển thị tổng số đơn hàng bằng 1 Và tổng doanh thu bằng 60.000.000. Fail
+TC_FR-13_03 Dashboard hiển thị tổng số đơn hàng bằng 3 Và tổng doanh thu bằng 0. Pass
+TC_FR-13_04 Dashboard hiển thị tổng số đơn hàng bằng 4 Và tổng doanh thu bằng 116.000.000. Fail (Tương tự với bug của TC_FR-13_02)
+TC_FR-13_05 Dashboard hiển thị tổng số đơn hàng bằng 1 Và tổng doanh thu bằng 0. Pass (Tuy nhiên bug vẫn có, vô tình đúng do 0 x 2 = 0)
+TC_FR-13_06 Dashboard hiển thị tổng số đơn hàng bằng 6 Và tổng doanh thu bằng 56.000.000. Fail (Tương tự với bug của TC_FR-13_02 do giá tiền bị x2 đối với mỗi đơn thành công, còn về mặt tính toán thì đơn hàng vẫn thực hiện doanh thu âm với tính toán chính xác)

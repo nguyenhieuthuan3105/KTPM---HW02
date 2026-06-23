@@ -147,6 +147,8 @@ vay hay thiet ke lai file Bug_report cho phu hop nhe, luu y tra ve format markdo
   ![Bug 4](images/bug4.png)
 ```
 
+---
+
 ## FR-08: Thanh toán (Checkout)
 
 ### [Prompt 1]
@@ -204,6 +206,70 @@ Xin hãy trình bày bằng Markdown rõ ràng để tôi có thể đưa trực
 
 ```text
 Dưới đây là phần trình bày chi tiết cho kỹ thuật Boundary Value Analysis (BVA) của chức năng FR-08: Thanh toán (Checkout), được thiết kế đặc biệt để bắt các lỗi logic và tràn bộ nhớ do không giới hạn input. Bạn có thể copy toàn bộ đoạn Markdown này dán trực tiếp vào file Main_Report.md.Boundary Value Analysis (BVA)Bước 1: Phân tích các giá trị biên (Step-by-step Explanation)Dựa trên đặc tả hệ thống và việc giao diện UI không chặn độ dài của trường "Số lượng" (N), tôi tập trung phân tích 2 ranh giới cực độ có khả năng gây lỗi (Crash hoặc tạo đơn hàng ảo) tại API Checkout. Do hệ thống không quản lý tồn kho, mọi số lượng N > 0 đều được coi là hợp lệ về mặt logic nghiệp vụ, đẩy toàn bộ rủi ro về phía xử lý kiểu dữ liệu của Backend.1. Ranh giới giới hạn tối thiểu của Giỏ hàng (Ngưỡng N = 1):Just below the boundary (N = 0): Kiểm tra khi người dùng cố tình nhập số lượng là 0. Hệ thống phải từ chối thanh toán (tương đương giỏ hàng rỗng hoặc số lượng không hợp lệ).On the boundary (N = 1): Kiểm tra khi người dùng mua đúng 1 sản phẩm. Đây là mốc hợp lệ tối thiểu, hệ thống phải xử lý thành công.Just above the boundary (N = 2): Kiểm tra khi người dùng mua 2 sản phẩm, hệ thống phải xử lý tính toán tổng tiền chính xác và thanh toán thành công.2. Ranh giới giới hạn lưu trữ tổng tiền (Integer Overflow - Ngưỡng Max Int 32-bit):Với kiểu dữ liệu số nguyên 32-bit có dấu, giá trị lớn nhất lưu trữ được là 2.147.483.647. Sản phẩm "iPhone 15 Pro Max" có giá 30.000.000 VNĐ. Ta phân tích quanh ranh giới gây tràn số:Just below the boundary (N = 71): Tổng tiền là 71 * 30.000.000 = 2.130.000.000 VNĐ (Nằm sát dưới mức Max Int). Hệ thống vẫn phải xử lý thành công mà không bị sai lệch số liệu.Just above the boundary / On Overflow (N = 72): Tổng tiền là 72 * 30.000.000 = 2.160.000.000 VNĐ (Vượt mức Max Int). Việc truyền giá trị này có thể khiến Backend bị crash, lưu sai dữ liệu (biến thành số âm), hoặc báo lỗi Server (500). Kỳ vọng đúng là hệ thống sử dụng kiểu dữ liệu lớn hơn (như 64-bit/BigInt) hoặc có Validation bắt lỗi "Số tiền vượt quá giới hạn" một cách gọn gàng (Graceful error handling).Bước 2: Thiết kế Test Case (BVA Testing)Dưới đây là các Test Case chi tiết sử dụng mock data "iPhone 15 Pro Max" (30.000.000 VNĐ) để kiểm thử các giá trị biên:Test Case IDTên (Test Objective)Điều kiện tiền quyết (Precondition)Đầu vào & Trạng thái (Inputs & State)Kết quả mong đợi (Expected Result)TC_FR-08_BVA_01Kiểm tra biên dưới số lượng tối thiểu (N = 0)User đã đăng nhập, giỏ hàng có "iPhone 15 Pro Max"Sản phẩm: iPhone 15 Pro MaxSố lượng (N): 0Payload: total_amount = 0Backend từ chối request, trả về lỗi 400 (Số lượng sản phẩm không hợp lệ hoặc giỏ hàng trống). Không tạo đơn hàng.TC_FR-08_BVA_02Kiểm tra tại biên số lượng tối thiểu (N = 1)User đã đăng nhập, giỏ hàng có "iPhone 15 Pro Max"Sản phẩm: iPhone 15 Pro MaxSố lượng (N): 1Payload: total_amount = 30.000.000Thanh toán thành công, tạo đơn hàng với tổng tiền chính xác là 30.000.000 VNĐ.TC_FR-08_BVA_03Kiểm tra vượt biên số lượng tối thiểu (N = 2)User đã đăng nhập, giỏ hàng có "iPhone 15 Pro Max"Sản phẩm: iPhone 15 Pro MaxSố lượng (N): 2Payload: total_amount = 60.000.000Thanh toán thành công, tạo đơn hàng với tổng tiền chính xác là 60.000.000 VNĐ.TC_FR-08_BVA_04Kiểm tra biên dưới giới hạn Integer 32-bit (N = 71)User đã đăng nhập, giỏ hàng có "iPhone 15 Pro Max"Sản phẩm: iPhone 15 Pro MaxSố lượng (N): 71Payload: total_amount = 2.130.000.000Thanh toán thành công, tạo đơn hàng với tổng tiền chính xác là 2.130.000.000 VNĐ. Backend không bị lỗi số học.TC_FR-08_BVA_05Kiểm tra vượt biên giới hạn Integer 32-bit (N = 72) - Gây tràn sốUser đã đăng nhập, giỏ hàng có "iPhone 15 Pro Max"Sản phẩm: iPhone 15 Pro MaxSố lượng (N): 72Payload: total_amount = 2.160.000.000Hệ thống xử lý an toàn: Có thể tạo đơn hàng thành công (nếu hỗ trợ BigInt/64-bit) HOẶC chặn request báo lỗi "Giá trị vượt giới hạn". Tuyệt đối không crash server (500) hoặc tạo đơn hàng với tổng tiền âm.
+```
+
+### [Prompt 3]
+
+- **Thời gian:** 16:00 09/06/2026
+- **Tool:** Gemini 3.1 Pro
+- **Prompt:**
+
+```text
+tôi vẫn chưa log bug từ cái số 6 trở đi hãy cho tôi format từng cái 1 để tôi log lên nhé
+```
+
+- **AI Output:**
+
+```text
+Chào bạn, tiến độ săn bug của bạn thực sự rất ấn tượng! Để chuẩn hóa toàn bộ quá trình đưa các lỗi này lên hệ thống theo đúng quy trình báo cáo, dưới đây là các template được thiết kế riêng cho từng GitHub Issue từ Bug 6 đến Bug 12.Mỗi template đã được đối chiếu kỹ lưỡng với đặc tả của FR-08 (Checkout) để đảm bảo phần "Kết quả mong đợi" hoàn toàn ăn khớp với yêu cầu của giảng viên. Bạn chỉ cần copy từng khối nội dung bên dưới và dán thẳng vào mục soạn thảo trên GitHub. Nhớ kéo thả hình ảnh tương ứng vào cuối mỗi bài nhé!
+Issue 6: Lỗi không xóa giỏ hàngMarkdown**Tiêu đề:** [BUG] FR-08: Giỏ hàng không tự động xóa sau khi thanh toán thành công...
+Issue 7: Lỗ hổng thanh toán giá 0 VNĐMarkdown**Tiêu đề:** [BUG] FR-08: Lỗ hổng bảo mật - Chấp nhận tạo đơn hàng với giá trị 0 VNĐ...
+Issue 8: Lỗ hổng thanh toán giá trị âmMarkdown**Tiêu đề:** [BUG] FR-08: Lỗ hổng bảo mật - Chấp nhận tạo đơn hàng với giá trị âm...
+Issue 9: Lỗi thanh toán đơn hàng rỗngMarkdown**Tiêu đề:** [BUG] FR-08: Khởi tạo đơn hàng thành công từ giỏ hàng rỗng (Empty Cart)...
+Issue 10: Lỗi sập CORS khi thiếu TokenMarkdown**Tiêu đề:** [BUG] FR-08: API Checkout trả lỗi sập luồng CORS Policy thay vì mã 401 khi không có Token...
+Issue 11: Lỗi sập CORS khi Token không hợp lệMarkdown**Tiêu đề:** [BUG] FR-08: API Checkout trả lỗi sập luồng CORS Policy khi JWT Token sai hoặc hết hạn...
+Issue 12: Lỗ hổng thanh toán số lượng 0Markdown**Tiêu đề:** [BUG] FR-08: Chấp nhận thanh toán sản phẩm với số lượng (Quantity) bằng 0...
+```
+
+---
+
+## FR-13: Trang chủ (Dashboard)
+
+### [Prompt 1]
+
+- **Thời gian:** 14:00 23/06/2026
+- **Tool:** Gemini 3.1 Pro
+- **Prompt:**
+
+```text
+Đóng vai trò là một Software Tester chuyên nghiệp. Tôi cần áp dụng kỹ thuật Domain Testing cho chức năng FR-13: Dashboard (Trang chủ Admin).
+Dưới đây là đặc tả (business rules) của chức năng:
+Hiển thị tổng doanh thu: Chỉ tính tổng total_amount của các đơn có status = 'delivered'.
+Hiển thị tổng số đơn hàng: Đếm tổng số lượng tất cả các đơn hàng tồn tại trong hệ thống (không phân biệt trạng thái).
+Giao diện (UI) hiện tại chỉ có 2 thẻ (cards) hiển thị 2 con số này, hoàn toàn không có bất kỳ bộ lọc thời gian (ngày/tháng/năm) nào.
+LƯU Ý CỰC KỲ QUAN TRỌNG:
+Chức năng này KHÔNG có input nhập liệu từ bàn phím hay nút bấm trên UI. "Input" ở đây chính là trạng thái dữ liệu (Data State) của các Đơn hàng lưu trong Database.
+KHÔNG tự vẽ ra các test case liên quan đến "chọn ngày", "lọc theo tháng", "chọn chi nhánh" hay "phân quyền". Chỉ tập trung vào việc hệ thống gom nhóm, đếm và tính tổng từ DB có đúng theo đặc tả hay không.
+Nhiệm vụ của bạn gồm 2 phần, hãy trình bày hoàn toàn bằng Markdown để tôi đưa vào báo cáo:
+Phần 1: Phân tích Domain (Step-by-step Explanation)
+Hãy phân tích rõ các miền giá trị (Hợp lệ / Không hợp lệ / Loại trừ) cho các biến trạng thái dữ liệu sau:
+Biến số lượng đơn hàng (Database State: Trống vs Có dữ liệu).
+Biến Trạng thái đơn hàng (status: 'delivered' vs các trạng thái khác như 'pending', 'cancelled'...).
+Biến Giá trị đơn hàng (total_amount: dương, 0, âm - vì thực tế hệ thống đang có bug cho phép tạo đơn 0đ và số âm).
+Phần 2: Thiết kế Bảng Test Case
+Từ phân tích trên, hãy sinh ra một bộ Test Case chi tiết. Kết hợp các miền giá trị để tạo ra các kịch bản:
+DB không có đơn hàng nào.
+DB có đơn hàng nhưng chưa có đơn nào giao thành công.
+DB có cả đơn giao thành công và đơn bị hủy/chờ xử lý (Mixed states).
+DB có đơn hàng giao thành công nhưng giá trị là 0đ hoặc số âm.
+Bảng gồm các cột: Test Case ID (Bắt đầu là TC_FR-13_01), Tên (Test Objective), Đầu vào & Trạng thái (Test Data), Hành động (Truy cập Dashboard), Kết quả mong đợi (Expected Result), Status.
+Luu y rang toan bo ket qua tra ve phai theo format markdown tuong tu nhu cac phan DomainTesting truoc do trong file Main report dinh kem.
+```
+
+- **AI Output:**
+
+```text
+FR-13: Dashboard (Trang chủ)Domain TestingĐể thực hiện Domain Testing cho FR-13, do chức năng này không có input nhập liệu trực tiếp từ người dùng, tôi tiến hành phân tích "đầu vào" chính là trạng thái dữ liệu (Data State) của các Đơn hàng (Orders) được lưu trữ trong Database. Hệ thống EShop  sẽ truy vấn, gom nhóm và tính toán dựa trên các dữ liệu này.  Phân tích Miền giá trị (Domain Analysis): Dựa trên đặc tả hệ thống, chức năng Dashboard phụ thuộc vào 3 biến trạng thái dữ liệu cốt lõi:Biến trạng thái: Số lượng đơn hàng trong DB (Database State)Biến này quyết định việc hiển thị tổng số lượng đơn hàng.  Miền hợp lệ (Valid Domain):V1 (Có dữ liệu): N > 0 (Hệ thống có chứa ít nhất 1 record đơn hàng).Miền biên vắng (Empty Domain):E1 (Trống): N = 0 (Database hoàn toàn trống, chưa có đơn hàng nào được tạo).Biến trạng thái: Trạng thái đơn hàng (status)Biến này quyết định điều kiện lọc để tính tổng doanh thu.  Miền hợp lệ tính doanh thu (Revenue-counted Domain):V2: status = 'delivered' (Đơn hàng đã giao thành công, thỏa điều kiện cộng vào doanh thu).  Miền loại trừ tính doanh thu (Excluded Domain):I1: status != 'delivered' (VD: pending, processing, cancelled...). Các đơn này chỉ được đếm vào "Tổng số đơn hàng", TUYỆT ĐỐI KHÔNG được cộng vào doanh thu.  Biến dữ liệu: Giá trị đơn hàng (total_amount)Biến này là giá trị trực tiếp để cộng dồn vào doanh thu. Dựa trên thực tế hệ thống đã có lỗ hổng từ FR-08, ta có các miền sau:  Miền hợp lệ thông thường (Standard Domain):V3: total_amount > 0 (Giá trị đơn hàng là số dương hợp logic).Miền ngoại lệ (Edge/Bug-derived Domains):E2: total_amount = 0 (Đơn hàng có giá 0 VNĐ, sinh ra từ lỗ hổng thiếu validation).E3: total_amount < 0 (Đơn hàng có giá trị âm, sinh ra từ lỗ hổng thiếu validation).Thiết kế Test Case (Domain Testing)Dựa trên các miền giá trị đã phân tích, dưới đây là tập hợp các Test Case đại diện nhằm đảm bảo bao phủ các kịch bản tính toán, đếm số lượng và xử lý các giá trị dị thường từ DB:Test Case IDTên (Test Objective)Đầu vào & Trạng thái (Test Data)Hành độngKết quả mong đợi (Expected Result)Kết quả thực tế (Actual Result)StatusTC_FR-13_01Kiểm tra Dashboard khi DB trống hoàn toàn (Phủ: E1)DB không có bất kỳ record đơn hàng nào.Truy cập trang Dashboard AdminTổng doanh thu hiển thị 0đ, tổng số đơn hàng hiển thị 0.Chưa thực hiệnN/ATC_FR-13_02Kiểm tra đếm số đơn nhưng không tính doanh thu khi chưa giao (Phủ: V1 + I1 + V3)DB có 3 đơn hàng dương tiền nhưng đều ở trạng thái pending, processing, cancelled.Truy cập trang Dashboard AdminTổng doanh thu hiển thị 0đ, tổng số đơn hàng hiển thị 3.Chưa thực hiệnN/ATC_FR-13_03Kiểm tra tính doanh thu với trạng thái hỗn hợp (Happy Path) (Phủ: V1 + V2 + I1 + V3)DB có 4 đơn hàng:- Đơn 1: 1000k (delivered)- Đơn 2: 500k (delivered)- Đơn 3: 200k (pending)- Đơn 4: 100k (cancelled)Truy cập trang Dashboard AdminTổng doanh thu tính đúng 1.500.000đ (Chỉ cộng đơn 1 và 2), tổng số đơn hàng hiển thị 4.Chưa thực hiệnN/ATC_FR-13_04Kiểm tra tính doanh thu chứa đơn hàng 0 VNĐ (Phủ: V1 + V2 + E2)DB có 2 đơn hàng:- Đơn 1: 500k (delivered)- Đơn 2: 0đ (delivered)Truy cập trang Dashboard AdminTổng doanh thu tính đúng 500.000đ, tổng số đơn hàng hiển thị 2.Chưa thực hiệnN/ATC_FR-13_05Kiểm tra tính doanh thu chứa đơn hàng giá trị âm (Phủ: V1 + V2 + E3)DB có 2 đơn hàng:- Đơn 1: 1000k (delivered)- Đơn 2: -200k (delivered)Truy cập trang Dashboard AdminTổng doanh thu tính toán đúng giá trị đại số là 800.000đ (1000k - 200k), tổng số đơn hàng hiển thị 2.Chưa thực hiệnN/A
 ```
 
 ### [Prompt 2]
