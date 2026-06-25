@@ -274,6 +274,67 @@ FR-13: Dashboard (Trang chủ)Domain TestingĐể thực hiện Domain Testing c
 
 ### [Prompt 2]
 
+- **Thời gian:** 21:30 24/06/2026
+- **Tool:** Gemini 3.1 Pro
+- **Prompt:**
+
+```text
+Đóng vai trò là một Software Tester chuyên nghiệp. Chúng ta đã hoàn thành Domain Testing và phát hiện ra một lỗi nghiêm trọng: Hệ thống hiện tại đang tính sai tổng doanh thu bằng cách nhân đôi (x2) giá trị thực tế của các đơn hàng 'delivered' (Bug 13).
+Bây giờ, tôi cần áp dụng kỹ thuật Boundary Value Analysis (BVA) cho chức năng FR-13: Dashboard (Trang chủ Admin).
+Đặc tả (Business Rules):
+Hiển thị tổng doanh thu: Chỉ tính tổng total_amount của các đơn có status = 'delivered'.
+Hiển thị tổng số đơn hàng: Đếm tổng số lượng tất cả các đơn hàng.
+Trạng thái hợp lệ chỉ gồm: pending, confirmed, shipping, delivered, canceled. Tuyệt đối KHÔNG tự bịa thêm trạng thái processing hay các trạng thái khác.
+Giao diện (UI) chỉ có 2 thẻ (cards) text, không có ô nhập liệu. Đầu vào (Input) chính là trạng thái dữ liệu trong Database.
+Các ranh giới (Boundaries) cần phân tích:
+Biên số lượng đơn hàng (N): N=0, N=1, và N cực lớn.
+Biên tổng doanh thu (Integer Overflow / BigInt): Giới hạn của kiểu số nguyên 32-bit (Max Int = 2.147.483.647). Do hệ thống đang bị lỗi x2 doanh thu, nếu tổng tiền thực tế trong DB là 1.100.000.000đ (1.1 tỷ), khi tính toán hệ thống sẽ nhân đôi thành 2.200.000.000đ -> Vượt ranh giới Max Int 32-bit và có nguy cơ gây Crash / Tràn số (hiển thị số âm).
+Biên hiển thị giao diện (UI Layout): Tổng tiền cực kỳ lớn (ví dụ: hàng trăm ngàn tỷ đồng - dài hơn 15 chữ số) để xem giao diện Card trên Dashboard có bị vỡ layout, tràn chữ ra ngoài thẻ hay không.
+Nhiệm vụ của bạn:Bước 1 (Giải thích step-by-step): Viết một đoạn giải thích chi tiết cách phân tích các giá trị biên (min, max, just below, just above, on the boundary) cho các ranh giới tổng tiền và số lượng đề cập ở trên. Giải thích rõ việc lỗi x2 ảnh hưởng thế nào đến việc test tràn số.Bước 2 (Thiết kế Bảng Test Case): Thiết kế bảng Test Case BVA chi tiết.
+Bảng gồm các cột: Test Case ID (Bắt đầu là TC_FR-13_BVA_01), Tên (Test Objective), Đầu vào & Trạng thái (Test Data trong DB), Kết quả mong đợi (Expected Result), Kết quả thực tế (Actual Result), Status. (Để trống cột Kết quả thực tế và điền N/A cho cột Status để tôi tự test).
+Yêu cầu trình bày hoàn toàn bằng định dạng Markdown để tôi copy trực tiếp vào main report.
+```
+
+- **AI Output:**
+
+```text
+Dưới đây là phần trình bày chi tiết cho kỹ thuật Boundary Value Analysis (BVA) của chức năng FR-13: Dashboard (Trang chủ Admin). Bạn có thể copy toàn bộ nội dung Markdown này và dán trực tiếp vào phần BVA của FR-13 trong file Main_Report.md.Boundary Value Analysis (BVA)Bước 1: Phân tích các giá trị biên (Step-by-step Explanation)Khác với các form nhập liệu thông thường, giao diện Dashboard không có input trực tiếp. Ranh giới (boundary) ở đây nằm ở giới hạn kiểu dữ liệu của hệ thống Backend/Database và giới hạn hiển thị (layout) của Frontend. Đặc biệt, việc tồn tại Bug 13 (nhân đôi doanh thu) làm thay đổi hoàn toàn cách chúng ta tiếp cận ranh giới tràn bộ nhớ số nguyên (Integer Overflow).Dưới đây là phân tích chi tiết cho 3 ranh giới chính:Biên số lượng đơn hàng (N):Min boundary (N = 0): Kiểm tra trạng thái rỗng khi Database chưa có dữ liệu. Tổng số đơn và tổng doanh thu đều phải là 0.Just above min (N = 1): Kiểm tra khi hệ thống có đúng 1 đơn hàng đầu tiên.Max boundary (N cực lớn): Kiểm tra khi số lượng đơn hàng lên tới hàng trăm ngàn hoặc hàng triệu (VD: N = 999.999) xem việc đếm (COUNT) có làm chậm hệ thống hay vỡ UI của thẻ hiển thị số lượng hay không.Biên lưu trữ Tổng doanh thu (Integer Overflow) & Tác động của Bug 13:Giới hạn tối đa của kiểu số nguyên 32-bit (Max Int có dấu) là 2.147.483.647.Thông thường, ta sẽ test giá trị trong DB mấp mé mốc 2.14 tỷ. Tuy nhiên, do Backend đang mắc Bug 13 (tự động x2 doanh thu), ngưỡng tràn số thực tế đối với dữ liệu đầu vào (DB) bị giảm đi một nửa (chỉ còn khoảng 1.073.741.823).Just below boundary: Tạo đơn hàng trong DB có giá trị 1.070.000.000đ. Khi tính toán, Backend x2 thành 2.140.000.000đ (Vẫn nằm trong giới hạn an toàn của 32-bit). Hệ thống không được crash.Just above boundary (Vượt biên): Tạo đơn hàng trong DB có giá trị 1.100.000.000đ (1.1 tỷ). Backend sẽ x2 thành 2.200.000.000đ. Mức này vượt qua mốc Max Int 32-bit. Ta cần test xem Backend có crash (lỗi 500), hay trả về một số âm dị thường do tràn bit, hay hệ thống đã phòng ngừa bằng cách dùng kiểu dữ liệu BigInt/Long (64-bit).Biên hiển thị giao diện (UI Layout):Tràn UI: Cố tình tạo một tổng doanh thu cực kỳ lớn, dài hơn 15-20 chữ số (Ví dụ: 100.000.000.000.000đ - 100 ngàn tỷ) để xem Frontend xử lý hiển thị thế nào. Text có bị tràn ra ngoài thẻ (Card) làm hỏng bố cục CSS, hay được tự động rút gọn (dùng dấu ... hoặc format 100T) một cách gọn gàng.Bước 2: Thiết kế Test Case (BVA Testing)Dưới đây là các Test Case chi tiết để kiểm thử các giá trị biên đã phân tích đối với chức năng Dashboard:Test Case IDTên (Test Objective)Đầu vào & Trạng thái (Test Data trong DB)Kết quả mong đợi (Expected Result)Kết quả thực tế (Actual Result)StatusTC_FR-13_BVA_01Kiểm tra biên dưới số lượng đơn (N = 0)DB hoàn toàn trống (0 đơn hàng).Dashboard hiển thị số lượng: 0. Doanh thu: 0đ.N/ATC_FR-13_BVA_02Kiểm tra sát biên dưới số lượng đơn (N = 1)DB có 1 đơn hàng delivered (Giá: 500.000đ).Dashboard hiển thị số lượng: 1. (Doanh thu x2 thành 1.000.000đ do Bug 13).N/ATC_FR-13_BVA_03Kiểm tra biên cận dưới giới hạn Max Int 32-bit (Test an toàn)DB có 1 đơn hàng delivered giá trị: 1.070.000.000đHệ thống nhân đôi thành 2.140.000.000đ (Chưa vượt Max Int). Dashboard hiển thị bình thường, Backend không bị lỗi số học hay crash.N/ATC_FR-13_BVA_04Kiểm tra vượt biên Max Int 32-bit (Gây tràn số do Bug 13)DB có 1 đơn hàng delivered giá trị: 1.100.000.000đ (1.1 Tỷ)Mức x2 là 2.200.000.000đ vượt mốc 32-bit. Kỳ vọng hệ thống dùng kiểu BigInt/Long để hiển thị chính xác số này. Tuyệt đối không được văng lỗi 500 Internal Server Error hay hiển thị doanh thu âm.N/ATC_FR-13_BVA_05Kiểm tra giới hạn hiển thị UI (Vỡ Layout)DB có đơn hàng delivered tổng giá trị siêu lớn: 100.000.000.000.000đGiao diện Dashboard co dãn hợp lý hoặc cắt bớt chuỗi text. Chữ số không được phép tràn ra ngoài khung Card hiển thị hay đè lên các thành phần khác.N/ATC_FR-13_BVA_06Kiểm tra hiển thị UI với số lượng đơn hàng (N) cực lớnDB chứa 999.999 đơn hàng ở trạng thái canceled và delivered.Số đếm đơn hàng hiển thị 999.999 vừa vặn trong Card. Hệ thống không bị timeout (quá thời gian truy vấn) khi đếm số lượng bản ghi lớn.N/A
+```
+
+### [Prompt 2]
+
+- **Thời gian:** 21:30 09/06/2026
+- **Tool:** Gemini 3.1 Pro
+- **Prompt:**
+
+```text
+
+```
+
+- **AI Output:**
+
+```text
+
+```
+
+### [Prompt 2]
+
+- **Thời gian:** 21:30 09/06/2026
+- **Tool:** Gemini 3.1 Pro
+- **Prompt:**
+
+```text
+
+```
+
+- **AI Output:**
+
+```text
+
+```
+
+### [Prompt 2]
+
 - **Thời gian:** 21:30 09/06/2026
 - **Tool:** Gemini 3.1 Pro
 - **Prompt:**

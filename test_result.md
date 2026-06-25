@@ -43,3 +43,10 @@ TC_FR-13_03 Dashboard hiển thị tổng số đơn hàng bằng 3 Và tổng d
 TC_FR-13_04 Dashboard hiển thị tổng số đơn hàng bằng 4 Và tổng doanh thu bằng 116.000.000. Fail (Tương tự với bug của TC_FR-13_02)
 TC_FR-13_05 Dashboard hiển thị tổng số đơn hàng bằng 1 Và tổng doanh thu bằng 0. Pass (Tuy nhiên bug vẫn có, vô tình đúng do 0 x 2 = 0)
 TC_FR-13_06 Dashboard hiển thị tổng số đơn hàng bằng 6 Và tổng doanh thu bằng 56.000.000. Fail (Tương tự với bug của TC_FR-13_02 do giá tiền bị x2 đối với mỗi đơn thành công, còn về mặt tính toán thì đơn hàng vẫn thực hiện doanh thu âm với tính toán chính xác)
+
+TC_FR-13_BVA_01 Dashboard hiển thị tổng số đơn hàng bằng 0 Và tổng doanh thu bằng 0. Pass
+TC_FR-13_BVA_02 Dashboard hiển thị tổng số đơn hàng bằng 1 Và tổng doanh thu bằng 60.000.000. Pass
+TC_FR-13_BVA_03 Dashboard hiển thị tổng số đơn hàng bằng 1 Và tổng doanh thu bằng 2.100.000.000. Pass
+TC_FR-13_BVA_04 Dashboard hiển thị tổng số đơn hàng bằng 1 Và tổng doanh thu bằng 2.160.000.000. Pass
+TC_FR-13_BVA_05 Dashboard hiển thị tổng số đơn hàng bằng 1 Và tổng doanh thu bằng 600.000.000.000.000 (Đúng với đặc tả lỗi x2). Tuy nhiên khi kéo dãn UI thì số bị tràn ra khỏi box. Fail (bug 14: Ô tổng doanh thu không responsive)
+TC_FR-13_BVA_06 F12 để chỉnh sửa trực tiếp html thành 999.999.999.999.999. Kkhi kéo dãn UI thì số bị tràn ra khỏi box. Fail. (Chưa test hiệu năng Backend do giới hạn môi trường local). (Bug 15: Ô tổng đơn hàng không responsive)

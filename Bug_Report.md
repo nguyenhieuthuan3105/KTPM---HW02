@@ -112,3 +112,19 @@
 - **GitHub Issue:** [Link Issue #13]
 - **Ảnh minh chứng:**
   ![Bug 13](images/bug13.png)
+
+### 14. Bug 14: Giao diện thẻ Tổng doanh thu không responsive, bị vỡ layout khi số tiền quá lớn
+
+- **Mô tả:** Khi tổng doanh thu đạt mức cực kỳ lớn (ví dụ: hàng trăm nghìn tỷ đồng, có thể xảy ra nhanh hơn do hệ thống đang mắc lỗi nhân đôi doanh thu), thẻ (Card) hiển thị Tổng doanh thu trên trang Dashboard không có cơ chế co giãn hoặc xử lý văn bản dài (truncate/format). Kết quả là dãy số bị tràn ra ngoài khung giới hạn của thẻ, đè lên các thành phần khác và gây vỡ layout (không responsive).
+- **Test Case phát hiện:** `TC_FR-13_BVA_05`
+- **GitHub Issue:** [Link Issue #14]
+- **Ảnh minh chứng:**
+  ![Bug 14](images/bug14.png)
+
+### 15. Bug 15: Giao diện thẻ Tổng số đơn hàng không responsive, bị vỡ layout khi số lượng cực lớn
+
+- **Mô tả:** Tương tự như thẻ Tổng doanh thu, thẻ "Tổng số đơn hàng" cũng thiếu cơ chế thiết kế responsive. Mặc dù thực tế khó đạt được con số hàng triệu tỷ đơn hàng, nhưng khi mock dữ liệu để kiểm thử giới hạn hiển thị (BVA), dãy số lượng lớn (VD: 999.999.999.999.999) đã bị tràn ra khỏi khung chứa của thẻ, làm hỏng cấu trúc giao diện trang Dashboard.
+- **Test Case phát hiện:** `TC_FR-13_BVA_06`
+- **GitHub Issue:** [Link Issue #15]
+- **Ảnh minh chứng:**
+  ![Bug 15](images/bug15.png)
