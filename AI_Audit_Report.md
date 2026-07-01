@@ -301,50 +301,78 @@ Yêu cầu trình bày hoàn toàn bằng định dạng Markdown để tôi cop
 Dưới đây là phần trình bày chi tiết cho kỹ thuật Boundary Value Analysis (BVA) của chức năng FR-13: Dashboard (Trang chủ Admin). Bạn có thể copy toàn bộ nội dung Markdown này và dán trực tiếp vào phần BVA của FR-13 trong file Main_Report.md.Boundary Value Analysis (BVA)Bước 1: Phân tích các giá trị biên (Step-by-step Explanation)Khác với các form nhập liệu thông thường, giao diện Dashboard không có input trực tiếp. Ranh giới (boundary) ở đây nằm ở giới hạn kiểu dữ liệu của hệ thống Backend/Database và giới hạn hiển thị (layout) của Frontend. Đặc biệt, việc tồn tại Bug 13 (nhân đôi doanh thu) làm thay đổi hoàn toàn cách chúng ta tiếp cận ranh giới tràn bộ nhớ số nguyên (Integer Overflow).Dưới đây là phân tích chi tiết cho 3 ranh giới chính:Biên số lượng đơn hàng (N):Min boundary (N = 0): Kiểm tra trạng thái rỗng khi Database chưa có dữ liệu. Tổng số đơn và tổng doanh thu đều phải là 0.Just above min (N = 1): Kiểm tra khi hệ thống có đúng 1 đơn hàng đầu tiên.Max boundary (N cực lớn): Kiểm tra khi số lượng đơn hàng lên tới hàng trăm ngàn hoặc hàng triệu (VD: N = 999.999) xem việc đếm (COUNT) có làm chậm hệ thống hay vỡ UI của thẻ hiển thị số lượng hay không.Biên lưu trữ Tổng doanh thu (Integer Overflow) & Tác động của Bug 13:Giới hạn tối đa của kiểu số nguyên 32-bit (Max Int có dấu) là 2.147.483.647.Thông thường, ta sẽ test giá trị trong DB mấp mé mốc 2.14 tỷ. Tuy nhiên, do Backend đang mắc Bug 13 (tự động x2 doanh thu), ngưỡng tràn số thực tế đối với dữ liệu đầu vào (DB) bị giảm đi một nửa (chỉ còn khoảng 1.073.741.823).Just below boundary: Tạo đơn hàng trong DB có giá trị 1.070.000.000đ. Khi tính toán, Backend x2 thành 2.140.000.000đ (Vẫn nằm trong giới hạn an toàn của 32-bit). Hệ thống không được crash.Just above boundary (Vượt biên): Tạo đơn hàng trong DB có giá trị 1.100.000.000đ (1.1 tỷ). Backend sẽ x2 thành 2.200.000.000đ. Mức này vượt qua mốc Max Int 32-bit. Ta cần test xem Backend có crash (lỗi 500), hay trả về một số âm dị thường do tràn bit, hay hệ thống đã phòng ngừa bằng cách dùng kiểu dữ liệu BigInt/Long (64-bit).Biên hiển thị giao diện (UI Layout):Tràn UI: Cố tình tạo một tổng doanh thu cực kỳ lớn, dài hơn 15-20 chữ số (Ví dụ: 100.000.000.000.000đ - 100 ngàn tỷ) để xem Frontend xử lý hiển thị thế nào. Text có bị tràn ra ngoài thẻ (Card) làm hỏng bố cục CSS, hay được tự động rút gọn (dùng dấu ... hoặc format 100T) một cách gọn gàng.Bước 2: Thiết kế Test Case (BVA Testing)Dưới đây là các Test Case chi tiết để kiểm thử các giá trị biên đã phân tích đối với chức năng Dashboard:Test Case IDTên (Test Objective)Đầu vào & Trạng thái (Test Data trong DB)Kết quả mong đợi (Expected Result)Kết quả thực tế (Actual Result)StatusTC_FR-13_BVA_01Kiểm tra biên dưới số lượng đơn (N = 0)DB hoàn toàn trống (0 đơn hàng).Dashboard hiển thị số lượng: 0. Doanh thu: 0đ.N/ATC_FR-13_BVA_02Kiểm tra sát biên dưới số lượng đơn (N = 1)DB có 1 đơn hàng delivered (Giá: 500.000đ).Dashboard hiển thị số lượng: 1. (Doanh thu x2 thành 1.000.000đ do Bug 13).N/ATC_FR-13_BVA_03Kiểm tra biên cận dưới giới hạn Max Int 32-bit (Test an toàn)DB có 1 đơn hàng delivered giá trị: 1.070.000.000đHệ thống nhân đôi thành 2.140.000.000đ (Chưa vượt Max Int). Dashboard hiển thị bình thường, Backend không bị lỗi số học hay crash.N/ATC_FR-13_BVA_04Kiểm tra vượt biên Max Int 32-bit (Gây tràn số do Bug 13)DB có 1 đơn hàng delivered giá trị: 1.100.000.000đ (1.1 Tỷ)Mức x2 là 2.200.000.000đ vượt mốc 32-bit. Kỳ vọng hệ thống dùng kiểu BigInt/Long để hiển thị chính xác số này. Tuyệt đối không được văng lỗi 500 Internal Server Error hay hiển thị doanh thu âm.N/ATC_FR-13_BVA_05Kiểm tra giới hạn hiển thị UI (Vỡ Layout)DB có đơn hàng delivered tổng giá trị siêu lớn: 100.000.000.000.000đGiao diện Dashboard co dãn hợp lý hoặc cắt bớt chuỗi text. Chữ số không được phép tràn ra ngoài khung Card hiển thị hay đè lên các thành phần khác.N/ATC_FR-13_BVA_06Kiểm tra hiển thị UI với số lượng đơn hàng (N) cực lớnDB chứa 999.999 đơn hàng ở trạng thái canceled và delivered.Số đếm đơn hàng hiển thị 999.999 vừa vặn trong Card. Hệ thống không bị timeout (quá thời gian truy vấn) khi đếm số lượng bản ghi lớn.N/A
 ```
 
-### [Prompt 2]
+---
 
-- **Thời gian:** 21:30 09/06/2026
+## Agent Skill
+
+### [Prompt 1]
+
+- **Thời gian:** 14:30 29/06/2026
 - **Tool:** Gemini 3.1 Pro
 - **Prompt:**
 
 ```text
-
+tôi đã làm xong 3 trong số 4 fr, và đề có yêu cầu như sau:
+Agent Skill: You are encouraged to build Agent Skills that apply the domain testing and boundary value analysis techniques, so that they can be reused on additional features in future testing tasks. Submit the skills together with demonstration videos YouTube links that show, end to end, how you used the skills on a complete feature.
+Tôi dự tính sẽ sử dụng chính fr-20: "FR-20: Giỏ hàng (Shopping Cart) trên Mobile: Kiểm thử các thao tác vuốt, chạm, và cập nhật số lượng (Boundary Value cho số lượng min/max) trực tiếp trên màn hình cảm ứng." để làm test cho phần skill này, tuy nhiên trước tiên là tôi cần xây dựng skill đã, mà tôi đã không biết nên làm như nào. Bạn tôi có gợi ý tôi là tạo skill ngay trong vs code nhưng tôi không biết làm sao. Bạn có thể hỗ trợ tôi không? Đây là file đề bài (2026....) và tất cả các file có liên quan trong bài tập lần này. trong đó quan trọng nhất là file Mai Report chứa các fr. Tôi đã làm sẵn 3 fr với format đầy đủ. Bạn hãy dùng nó để tham khảo cho skill agent nhé.
 ```
 
 - **AI Output:**
 
 ```text
-
+Bước 1: Khái niệm về Agent Skill trong VS CodeTrong VS Code, nếu bạn dùng các AI extension (như GitHub Copilot Chat, Cline, RooCode, hoặc Cursor), bạn có thể tạo một file .md chứa toàn bộ chỉ thị. Khi chat với AI, bạn chỉ cần yêu cầu: "Hãy đọc file Hướng dẫn này và áp dụng nó để phân tích đặc tả chức năng sau...". Đó chính là cách Agent Skill hoạt động!Bước 2: Tạo file Agent Skill (Khung tư duy của Tester)Trong thư mục dự án trên VS Code, bạn hãy tạo một file mới đặt tên là Eshop_QA_Agent_Skill.md. Sau đó, copy toàn bộ nội dung dưới đây dán vào file đó. (Nội dung này được tôi đúc kết từ chính file Main_Report.md của bạn để AI bắt chước chính xác 100% phong cách của bạn).Markdown# ESHOP QA AGENT SKILL - SYSTEM INSTRUCTIONS
+**Role:** Bạn là một Senior Software Tester. Nhiệm vụ của bạn là áp dụng kỹ thuật Domain Testing và Boundary Value Analysis (BVA) để thiết kế Test Case cho hệ thống EShop.
+**Context & Constraints:**
+1. Trình bày 100% bằng tiếng Việt và sử dụng định dạng Markdown.
+2. KHÔNG tự bịa đặt (hallucinate) dữ liệu, trạng thái, hoặc tính năng không có trong đặc tả. Hệ thống KHÔNG có chức năng quản lý tồn kho (stock).
+3. Các bảng Test Case PHẢI luôn có cột: "Kết quả thực tế (Actual Result)" (để trống) và "Status" (điền N/A).
+**Workflow (Quy trình thực thi):**
+Khi User cung cấp cho bạn [Tên chức năng] và [Đặc tả], bạn phải thực hiện tuần tự 4 bước sau, gom vào một câu trả lời duy nhất:
+## BƯỚC 1: DOMAIN TESTING ANALYSIS
+- Phân tích chi tiết các biến đầu vào (Inputs, bao gồm cả thao tác người dùng như vuốt/chạm nếu là Mobile) và biến trạng thái (State).
+- Xác định rõ các Miền hợp lệ (Valid Domains) và Miền không hợp lệ (Invalid/Edge Domains).
+- Dựa vào phân tích, sinh ra bảng "Thiết kế Test Case (Domain Testing)".
+- Format bảng: `| Test Case ID | Tên (Test Objective) | Đầu vào & Trạng thái (Test Data) | Kết quả mong đợi (Expected Result) | Kết quả thực tế (Actual Result) | Status |`
+- Cột Test Case ID có format: `TC_[ID Chức Năng]_[Số thứ tự]`
+## BƯỚC 2: BOUNDARY VALUE ANALYSIS (BVA)
+- Phân tích các ranh giới (Boundaries) từ đặc tả (ví dụ: Số lượng Min, Max, hoặc giới hạn kích thước màn hình, thao tác vật lý).
+- Giải thích rõ cách chọn giá trị: Min, Min+1, Max-1, Max.
+- Sinh ra bảng "Thiết kế Test Case (BVA Testing)" với format giống hệt bảng Domain Testing.
+- Cột Test Case ID có format: `TC_[ID Chức Năng]_BVA_[Số thứ tự]`
+## BƯỚC 3: AI GAP ANALYSIS (Khoảng trống AI)
+- Bạn (AI) hãy tự nhận xét xem với đặc tả này, có trường hợp nào bạn dễ bị bỏ sót không (ví dụ: thiếu UI testing, thiếu phần cứng, hoặc giới hạn về việc không có thiết bị mobile thật để test vuốt/chạm).
+## BƯỚC 4: BUG REPORT TEMPLATE
+- Sinh sẵn 1 template Bug Report theo chuẩn GitHub Issue để User có thể dùng ngay nếu phát hiện lỗi trong quá trình thực thi test.
+- Bao gồm: Tiêu đề, Mô tả lỗi, Bước tái hiện, Kết quả mong đợi, Kết quả thực tế, Test Case liên quan, Ảnh minh chứng.
+Bước 3: Kích hoạt Agent Skill để xử lý FR-20Bây giờ, Agent Skill đã sẵn sàng. Bạn mở bảng Chat của AI trong VS Code (ví dụ: Copilot Chat) và đưa ra câu Prompt kích hoạt như sau:Prompt kích hoạt trong VS Code:"Hãy đóng vai trò là Eshop QA Agent. Vui lòng đọc file @Eshop_QA_Agent_Skill.md để hiểu quy trình làm việc và format đầu ra.Sau đó, áp dụng toàn bộ kỹ năng đó để xử lý chức năng sau:[Tên chức năng]: FR-20: Giỏ hàng (Shopping Cart) trên Mobile[Đặc tả]:Môi trường: Ứng dụng Mobile (Màn hình cảm ứng).Tính năng: Kiểm thử các thao tác vuốt (swipe) để xóa sản phẩm, chạm (tap) để chọn.Cập nhật số lượng: Cập nhật số lượng trực tiếp trên giao diện. (Gợi ý cho BVA: Số lượng tối thiểu là 1, số lượng tối đa có thể bị chặn bởi 2 chữ số là 99).Giao diện tự động tính lại tổng tiền khi số lượng thay đổi.Xóa sản phẩm: Khi số lượng giảm xuống 0 hoặc vuốt để xóa, sản phẩm biến mất khỏi giỏ.Hãy thực thi cả 4 bước được quy định trong Skill nhé."Bước 4: Chạy Test và Quay Video (Lấy điểm Agent Skill)   Đây là kịch bản hoàn hảo để bạn quay video màn hình:Mở đầu video: Bật VS Code lên, mở file Eshop_QA_Agent_Skill.md và giới thiệu ngắn gọn: "Đây là Agent Skill tôi xây dựng để tự động hóa tư duy Domain Testing và BVA, chống AI bịa đặt dữ liệu và ép nó trả về đúng format báo cáo".Kích hoạt: Mở cửa sổ Chat của AI, copy câu "Prompt kích hoạt" ở Bước 3 dán vào và nhấn Enter.Show kết quả: AI sẽ chạy một mạch tuôn ra toàn bộ: Phân tích Domain (có thao tác vuốt/chạm), BVA (với min = 1, max = 99, 100), AI Gap và Template Bug. Cuộn màn hình để GV thấy kết quả rất chuyên nghiệp.Thực thi thực tế: Chuyển sang trình duyệt (bật chế độ Mobile view - F12) hoặc máy ảo Emulator. Lấy thử 1 test case vuốt để xóa, hoặc nhập số lượng 0 xem nó có xóa sản phẩm thật không.Log Bug: Nếu có lỗi (chắc chắn FR này có lỗi), copy cái Template Bug AI vừa sinh ra, điền thông tin lỗi bạn vừa bắt được vào.Kết thúc video. Cách làm này không chỉ giúp bạn hoàn thành FR-20 cực kỳ nhàn nhã, mà còn chứng minh được bạn đã hiểu và làm chủ hoàn toàn công cụ AI để tạo ra một quy trình làm việc chuẩn mực! Bạn hãy thử tạo file và chạy lệnh trong VS Code xem AI trả về kết quả mượt mà như thế nào nhé.
 ```
 
-### [Prompt 2]
+---
 
-- **Thời gian:** 21:30 09/06/2026
-- **Tool:** Gemini 3.1 Pro
+## FR-20: Giỏ hàng trên Mobile (Mobile Cart)
+
+### [Prompt 1] (Agent Skill Execution)
+
+- **Thời gian:** 29/06/2026 14:30
+- **Tool:** Eshop QA Agent Skill
 - **Prompt:**
 
 ```text
+**System Core Blueprint (Quy tắc hệ thống):**
+(Trích xuất tóm tắt nhiệm vụ của Agent: Áp dụng Domain Testing, BVA, tuân thủ định dạng Markdown bảng biểu, không hallucinate, xuất 3 file.)
 
+**Input Feature Specification Used (Đặc tả đầu vào):**
+FR-20: Giỏ hàng (Shopping Cart) trên Mobile.
+- Môi trường: Ứng dụng Mobile (Màn hình cảm ứng).
+- Tính năng: Kiểm thử các thao tác vuốt (swipe) để xóa sản phẩm, chạm (tap) để chọn.
+- Cập nhật số lượng: Cập nhật số lượng trực tiếp trên giao diện.
+- Gợi ý cho BVA: Số lượng tối thiểu là 1, số lượng tối đa không giới hạn.
+- Giao diện tự động tính lại tổng tiền khi số lượng thay đổi.
+- Xóa sản phẩm: Khi số lượng giảm xuống 0 hoặc vuốt để xóa, sản phẩm biến mất khỏi giỏ.
 ```
 
 - **AI Output:**
 
 ```text
-
-```
-
-### [Prompt 2]
-
-- **Thời gian:** 21:30 09/06/2026
-- **Tool:** Gemini 3.1 Pro
-- **Prompt:**
-
-```text
-
-```
-
-- **AI Output:**
-
-```text
-
+Tóm tắt ngắn gọn: Agent đã phân tích thành công các miền hợp lệ/không hợp lệ cho thao tác tap và swipe, thiết kế bộ test Domain và BVA bám sát biên số lượng 1/0, đồng thời tạo template Bug Report theo chuẩn GitHub Issue. Lưu ý quan trọng: do đặc tả không nêu ngưỡng tối đa số lượng, phần BVA chỉ kiểm thử biên dưới và các trạng thái chuyển về 0 để tránh tự đặt giới hạn không có trong yêu cầu.
 ```

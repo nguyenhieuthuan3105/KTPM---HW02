@@ -50,3 +50,22 @@ TC_FR-13_BVA_03 Dashboard hiển thị tổng số đơn hàng bằng 1 Và tổ
 TC_FR-13_BVA_04 Dashboard hiển thị tổng số đơn hàng bằng 1 Và tổng doanh thu bằng 2.160.000.000. Pass
 TC_FR-13_BVA_05 Dashboard hiển thị tổng số đơn hàng bằng 1 Và tổng doanh thu bằng 600.000.000.000.000 (Đúng với đặc tả lỗi x2). Tuy nhiên khi kéo dãn UI thì số bị tràn ra khỏi box. Fail (bug 14: Ô tổng doanh thu không responsive)
 TC_FR-13_BVA_06 F12 để chỉnh sửa trực tiếp html thành 999.999.999.999.999. Kkhi kéo dãn UI thì số bị tràn ra khỏi box. Fail. (Chưa test hiệu năng Backend do giới hạn môi trường local). (Bug 15: Ô tổng đơn hàng không responsive)
+
+# FR-20
+
+(bug16) Khi vừa mở giỏ hàng UI đã không hiển thị nút "+/-" trên dòng sản phẩm. Dòng hiển thị là "Tổng tạm tính" chứ không phải "Tổng cộng" như đặc tả.
+
+TC_FR-20_01 Không có chuyện gì xảy ra. Số lượng và sản phẩm trong giỏ vẫn giữ nguyên bình thường. Pass
+TC_FR-20_02 Sản phẩm bị xóa khỏi giỏ, danh sách cập nhật ngay, tổng tiền về 0đ vì không còn sản phẩm nào khác. Fail (vì không có dialog) (bug17)
+TC_FR-20_03 Trong mục số lượng của sản phẩm. Nếu chọn số hiện tại và thay bằng "1" thì sẽ bình thường, tuy nhiên nếu thay bằng bất kì số nào khác thì sẽ "số đó + 1". Trong ảnh chụp minh chứng bug (bug18) tôi đã nhập "2" và nó lập tức thành "3" và giá tiền thành 90.000.000đ. Fail
+TC_FR-20_04 Số lượng hiển thị thành 1, sản phẩm vẫn còn trong giỏ, tổng tiền cập nhật thành 30.000.000đ.
+TC_FR-20_05 Số lượng hiển thị thành 1, sản phẩm vẫn còn trong giỏ. Pass
+TC_FR-20_06 Hệ thống không chọn nhầm sản phẩm, không thay đổi số lượng và không làm thay đổi tổng tiền. Pass
+
+TC_FR-20_BVA_01 Số lượng hiển thị thành 1, sản phẩm vẫn còn trong giỏ. Pass
+TC_FR-20_BVA_02 Sản phẩm vẫn hiển thị trong giỏ, tổng tiền hiển thị đúng 30.000.000đ. Pass
+TC_FR-20_BVA_03 Sản phẩm vẫn hiển thị trong giỏ, tổng tiền hiển thị đúng 60.000.000đ. Pass
+TC_FR-20_BVA_04 Sản phẩm biến mất khỏi giỏ, danh sách cập nhật ngay, tổng tiền về 0đ khi không còn sản phẩm nào khác. Fail (vì không hiện dialog)
+TC_FR-20_BVA_05 Hệ thống không bị lỗi giao diện, không crash và vẫn hiển thị trạng thái giỏ rỗng bình thường. Pass
+
+(bug19) Đăng nhập rồi chọn 1 sản phẩm vào giỏ hàng. Sau đó đăng xuất thì giỏ hàng vẫn chứa sản phẩm đó.

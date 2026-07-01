@@ -319,3 +319,99 @@ Dưới đây là các Test Case chi tiết để kiểm thử các giá trị b
 ### Bug Reporting
 
 Toàn bộ danh sách lỗi phát hiện được từ các Test Case trên đã được báo cáo chi tiết kèm ảnh chụp màn hình và link GitHub Issues trong file đính kèm `Bug_Report.md`
+
+---
+
+## FR-20: Giỏ hàng (Shopping Cart) trên Mobile
+
+### Domain Testing
+
+**Phân tích Miền giá trị (Domain Analysis):**
+
+Đối với FR-20, đầu vào không chỉ là dữ liệu nhập liệu mà còn bao gồm thao tác cảm ứng trên thiết bị mobile. Tôi tách bài toán thành 5 biến chính: thao tác chạm để chọn sản phẩm, thao tác vuốt để xóa sản phẩm, trạng thái số lượng sản phẩm, trạng thái tổng tiền tự động tính lại trên giao diện, và biến trạng thái đăng nhập (Session). Trước hết, giỏ hàng phải có ít nhất một sản phẩm thì các thao tác chọn và xóa mới có ý nghĩa. Tiếp theo, số lượng sản phẩm được cập nhật trực tiếp trên UI nên miền hợp lệ phải bắt đầu từ 1. Do đặc tả không quy định việc giảm số lượng về 0 sẽ xóa sản phẩm, việc cố tình giảm số lượng về 0 (qua UI hoặc API) là một thao tác ngoại lệ (invalid domain) cần kiểm thử để đảm bảo hệ thống chặn lại an toàn ở mức 1.
+
+1. **Biến đầu vào:** Thao tác chạm (Tap) trên màn hình cảm ứng
+   **Miền hợp lệ (Valid Domains):**
+   - V1: Chạm đúng vào sản phẩm đang có trong giỏ để chọn sản phẩm.
+   - V2: Chạm đúng vào vùng điều khiển số lượng để tăng hoặc giảm số lượng.
+     **Miền không hợp lệ (Invalid Domains):**
+   - I1: Chạm vào vùng trống ngoài danh sách sản phẩm.
+   - I2: Chạm vào khu vực không có khả năng tương tác trên thẻ sản phẩm.
+
+2. **Biến đầu vào:** Thao tác vuốt (Swipe) để xóa sản phẩm
+   **Miền hợp lệ (Valid Domains):**
+   - V3: Vuốt đúng trên một dòng sản phẩm đang tồn tại trong giỏ để xóa sản phẩm đó.
+     **Miền không hợp lệ (Invalid Domains):**
+   - I3: Vuốt trên vùng trống khi giỏ hàng rỗng.
+
+3. **Biến trạng thái:** Số lượng sản phẩm trong giỏ
+   **Miền hợp lệ (Valid Domains):**
+   - V4: Số lượng = 1, đây là mức tối thiểu hợp lệ để sản phẩm còn hiển thị trong giỏ.
+   - V5: Số lượng > 1, hệ thống vẫn phải giữ sản phẩm trong giỏ và cập nhật tổng tiền tương ứng.
+     **Miền không hợp lệ (Invalid Domains):**
+   - I4: Số lượng = 0, sản phẩm phải biến mất khỏi giỏ.
+
+4. **Biến trạng thái:** Tổng tiền hiển thị trên UI
+   **Miền hợp lệ (Valid Domains):**
+   - V6: Tổng tiền được tính lại ngay khi số lượng thay đổi.
+     **Miền không hợp lệ (Invalid Domains):**
+   - I5: Tổng tiền không đổi sau khi số lượng đã thay đổi.
+
+5. **Biến trạng thái (Bổ sung):** Trạng thái phiên đăng nhập (Authentication Session)
+   - Do giỏ hàng gắn liền với người dùng, sự tồn tại của sản phẩm trong giỏ phụ thuộc vào trạng thái login.
+     **Miền hợp lệ (Valid Domains):**
+   - V7: Người dùng đang đăng nhập, xem giỏ hàng của chính mình.
+     **Miền không hợp lệ / Biên rủi ro (Invalid/Edge Domains):**
+   - I6: Người dùng đã Đăng xuất (Logout), giỏ hàng trên máy phải được làm sạch (clear) để tránh lộ lọt dữ liệu hoặc thanh toán nhầm bởi người dùng tiếp theo.
+
+**Thiết kế Test Case (Domain Testing)**
+
+Dựa trên các miền giá trị trên, dưới đây là bộ Test Case đại diện để bao phủ các thao tác cảm ứng, trạng thái giỏ hàng và cập nhật số lượng trên mobile.
+
+| Test Case ID    | Tên (Test Objective)                     | Đầu vào & Trạng thái (Test Data)                                                                                      | Kết quả mong đợi (Expected Result)                                                              | Kết quả thực tế (Actual Result)                                                                                                      | Status |
+| :-------------- | :--------------------------------------- | :-------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------- | :----- |
+| **TC_FR-20_01** | Kiểm tra chạm để chọn sản phẩm trong giỏ | Thiết bị: Mobile<br>Giỏ hàng: 1 sản phẩm iPhone 15 Pro Max<br>Giá: 30.000.000đ<br>Thao tác: Tap vào dòng sản phẩm     | Sản phẩm được chọn/đánh dấu trên giao diện, giỏ hàng không bị thay đổi số lượng hoặc tổng tiền. | Không có chuyện gì xảy ra. Số lượng và sản phẩm trong giỏ vẫn giữ nguyên bình thường.                                                | Pass   |
+| **TC_FR-20_02** | Kiểm tra vuốt để xóa sản phẩm            | Thiết bị: Mobile<br>Giỏ hàng: 1 sản phẩm iPhone 15 Pro Max<br>Giá: 30.000.000đ<br>Thao tác: Vuốt và Tap vào nút "Xóa" | Hiển thị dialog xác nhận xóa. Sau khi xác nhận sản phẩm biến mất khỏi giỏ, tổng tiền về 0đ.     | Sản phẩm bị xóa khỏi giỏ, tổng tiền về 0đ nhưng KHÔNG hiển thị dialog xác nhận xóa. (Bug 17).                                        | Fail   |
+| **TC_FR-20_03** | Kiểm tra tăng số lượng từ 1 lên 2        | Thiết bị: Mobile<br>Giỏ hàng: 1 iPhone 15 Pro Max<br>Số lượng ban đầu: 1<br>Thao tác: Thay số lượng thành 2           | Số lượng hiển thị thành 2, sản phẩm vẫn còn trong giỏ, tổng tiền cập nhật thành 60.000.000đ.    | UI thiếu nút "+/-", chỉ có ô nhập tay. Khi nhập "2", hệ thống tự cộng 1 thành "3", giá tiền sai thành 90.000.000đ. (Bug 16, Bug 18). | Fail   |
+| **TC_FR-20_04** | Kiểm tra giảm số lượng từ 2 xuống 1      | Thiết bị: Mobile<br>Giỏ hàng: 1 iPhone 15 Pro Max<br>Số lượng ban đầu: 2<br>Thao tác: Giảm số lượng xuống 1           | Số lượng hiển thị thành 1, sản phẩm vẫn còn trong giỏ, tổng tiền cập nhật thành 30.000.000đ.    | Số lượng hiển thị thành 1, sản phẩm vẫn còn trong giỏ, tổng tiền cập nhật thành 30.000.000đ.                                         | Pass   |
+| **TC_FR-20_05** | Kiểm tra giảm số lượng từ 1 xuống 0      | Thiết bị: Mobile<br>Giỏ hàng: 1 iPhone 15 Pro Max<br>Số lượng ban đầu: 1<br>Thao tác: Giảm số lượng xuống 0           | Sản phẩm biến mất khỏi giỏ, hoặc hệ thống chặn không cho phép giảm về 0 (giữ nguyên là 1).      | Số lượng hiển thị thành 1, sản phẩm vẫn còn trong giỏ (Hệ thống chặn giảm dưới 1).                                                   | Pass   |
+| **TC_FR-20_06** | Kiểm tra thao tác chạm vào vùng trống    | Thiết bị: Mobile<br>Giỏ hàng: 1 iPhone 15 Pro Max<br>Thao tác: Tap vào vùng trống ngoài sản phẩm                      | Hệ thống không chọn nhầm sản phẩm, không làm thay đổi tổng tiền.                                | Hệ thống không chọn nhầm sản phẩm, không thay đổi số lượng và không làm thay đổi tổng tiền.                                          | Pass   |
+| **TC_FR-20_07** | Kiểm tra quản lý phiên (Đăng xuất)       | Tài khoản A đăng nhập, thêm 1 sản phẩm vào giỏ.<br>Thao tác: Đăng xuất khỏi hệ thống.                                 | Giỏ hàng được dọn sạch, giao diện quay về giỏ hàng trống hoặc yêu cầu đăng nhập.                | Sau khi đăng xuất, truy cập lại giỏ hàng vẫn chứa nguyên sản phẩm của tài khoản cũ. (Bug 19 rò rỉ dữ liệu phiên).                    | Fail   |
+
+### Boundary Value Analysis (BVA)
+
+**Phân tích các giá trị biên (Step-by-step Explanation):**
+
+Với FR-20, biên quan trọng nhất nằm ở số lượng sản phẩm trong giỏ. Đặc tả chỉ nêu rõ mức số lượng tối thiểu là 1, nên tôi chọn biên dưới làm trọng tâm: just below boundary là 0, on the boundary là 1, và just above boundary là 2. Vì đặc tả không có quy tắc tự động xóa khi số lượng bằng 0 (việc xóa phải qua nút chuyên dụng có dialog xác nhận), BVA sẽ tập trung kiểm tra xem hệ thống có ngăn chặn (block) thao tác giảm số lượng xuống dưới 1 một cách an toàn hay không, và việc tính toán tổng tiền có thay đổi chính xác tại các mức biên này không.
+
+**Thiết kế Test Case (BVA Testing):**
+
+| Test Case ID        | Tên (Test Objective)                        | Đầu vào & Trạng thái (Test Data)                                                      | Kết quả mong đợi (Expected Result)                                                | Kết quả thực tế (Actual Result)                                                               | Status |
+| :------------------ | :------------------------------------------ | :------------------------------------------------------------------------------------ | :-------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------- | :----- |
+| **TC_FR-20_BVA_01** | Kiểm tra biên dưới số lượng (0)             | Thiết bị: Mobile<br>Số lượng ban đầu: 1<br>Thao tác: Giỏ hàng chuyển số lượng thành 0 | Không cho phép sản phẩm về 0 (giữ nguyên là 1) hoặc sản phẩm biến mất khỏi giỏ.   | Số lượng hiển thị thành 1, sản phẩm vẫn còn trong giỏ (bị chặn ở mức 1).                      | Pass   |
+| **TC_FR-20_BVA_02** | Kiểm tra tại biên số lượng tối thiểu (1)    | Thiết bị: Mobile<br>Số lượng ban đầu: 1<br>Thao tác: Mở giỏ hàng để xem               | Sản phẩm vẫn hiển thị trong giỏ, tổng tiền hiển thị đúng 30.000.000đ.             | Sản phẩm vẫn hiển thị trong giỏ, tổng tiền hiển thị đúng 30.000.000đ.                         | Pass   |
+| **TC_FR-20_BVA_03** | Kiểm tra vượt biên số lượng tối thiểu (2)   | Thiết bị: Mobile<br>Số lượng ban đầu: 2<br>Thao tác: Mở giỏ hàng để xem               | Sản phẩm vẫn hiển thị trong giỏ, tổng tiền hiển thị đúng 60.000.000đ.             | Sản phẩm vẫn hiển thị trong giỏ, tổng tiền hiển thị đúng 60.000.000đ.                         | Pass   |
+| **TC_FR-20_BVA_04** | Kiểm tra vuốt xóa khi sản phẩm đang tồn tại | Thiết bị: Mobile<br>Giỏ hàng: Có sản phẩm<br>Thao tác: Bấm nút xóa trên dòng sản phẩm | Hiển thị dialog xác nhận xóa. Nếu đồng ý, tổng tiền về 0đ.                        | Sản phẩm biến mất khỏi giỏ ngay lập tức, tổng tiền về 0đ. KHÔNG hiện dialog xác nhận.         | Fail   |
+| **TC_FR-20_BVA_05** | Kiểm tra vuốt trên giỏ hàng rỗng            | Thiết bị: Mobile<br>Giỏ hàng: rỗng<br>Thao tác: Swipe trên vùng trống của giỏ         | Hệ thống không bị lỗi giao diện, không crash và vẫn hiển thị trạng thái giỏ rỗng. | Hệ thống không bị lỗi giao diện, không crash và vẫn hiển thị trạng thái giỏ rỗng bình thường. | Pass   |
+
+### AI Gap Analysis
+
+1. **Bỏ quên biến trạng thái Phiên Đăng nhập (Authentication Session):**
+   - AI chỉ tập trung vào các thao tác vật lý trên UI (chạm/vuốt) mà hoàn toàn quên mất Giỏ hàng phải được liên kết chặt chẽ với Session của người dùng. AI không thiết kế kịch bản cho trạng thái Đăng xuất, dẫn đến việc tôi phải tự bổ sung và phát hiện ra **Bug 19** (Rò rỉ giỏ hàng).
+   - **Lý do:** AI phân tích cục bộ trong phạm vi một màn hình Mobile UI mà thiếu góc nhìn tổng thể về kiến trúc State Management (Client-Server) của hệ thống.
+
+2. **AI tự hallucinate ra luồng xử lý số lượng bằng 0:**
+   - Mặc dù thực tế điều này có thể đúng, nhưng đặc tả FR-20 không nói đến việc tự động xóa khỏi giỏ khi sửa số lượng bằng 0.
+   - **Lý do:** Có lẽ AI đã tự dựa vào thường thức phổ thông (common sense) của các hệ thống E-commerce có sẵn trong tập huấn luyện để áp đặt tính năng.
+
+3. **Thiếu thông tin về kiểu vuốt và vùng tương tác chính xác của UI:**
+   - Đặc tả nói có swipe để xóa và tap để chọn, nhưng không mô tả rõ là vuốt trái hay phải, có hiển thị hitbox hay không.
+   - **Lý do:** Khi thực thi thực tế trên thiết bị thật, hành vi gesture có thể khác nhau và AI không đủ ngữ cảnh để mường tượng ra UI thực tế nếu không có ảnh mockup. Việc này dẫn đến việc không lường trước được sự cố UI thiếu nút `+/-` (Bug 16).
+
+4. **AI bỏ qua đặc tả về Dialog xác nhận xóa:**
+   - AI hoàn toàn bỏ qua đặc tả rằng khi xóa sản phẩm khỏi giỏ hàng thì phải hiện dialog xác nhận. Testcase ban đầu mà AI cung cấp cho rằng khi xóa là sản phẩm biến mất ngay lập tức (Dẫn đến hụt mất Bug 17).
+   - **Lý do:** AI có thể đã quét nhanh và bỏ sót một câu yêu cầu nhỏ trong tài liệu đặc tả thô, hoặc tự cho rằng bước confirm dialog là không quan trọng đối với thao tác swipe.
+
+### Bug Reporting
+
+Toàn bộ danh sách lỗi phát hiện được từ các Test Case trên đã được báo cáo chi tiết kèm ảnh chụp màn hình và link GitHub Issues trong file đính kèm `Bug_Report.md`

@@ -128,3 +128,35 @@
 - **GitHub Issue:** [Link Issue #15]
 - **Ảnh minh chứng:**
   ![Bug 15](images/bug15.png)
+
+### 16. Bug 16: Lỗi hiển thị UI Giỏ hàng Mobile (Thiếu nút tăng/giảm và sai nhãn tổng tiền)
+
+- **Mô tả:** Giao diện giỏ hàng Mobile không hiển thị nút "+/-" để điều chỉnh số lượng như yêu cầu của đặc tả. Thay vào đó, người dùng chỉ có thể bấm vào để nhập số bằng tay. Đồng thời, nhãn tổng tiền hiển thị sai text là "Tổng tạm tính" thay vì "Tổng cộng" như trong yêu cầu của FR-07/FR-20.
+- **Test Case phát hiện:** `TC_FR-20_03`
+- **GitHub Issue:** [Link Issue #16]
+- **Ảnh minh chứng:**
+  ![Bug 16](images/bug16.jpg)
+
+### 17. Bug 17: Xóa sản phẩm khỏi giỏ hàng không có Dialog xác nhận
+
+- **Mô tả:** Theo đặc tả, nút Xóa (hoặc thao tác vuốt xóa) phải có hộp thoại (dialog) xác nhận trước khi thực hiện để tránh người dùng thao tác nhầm. Tuy nhiên, thực tế khi bấm xóa, sản phẩm biến mất khỏi giỏ hàng ngay lập tức mà không có bất kỳ cảnh báo nào.
+- **Test Case phát hiện:** `TC_FR-20_02`, `TC_FR-20_BVA_04`
+- **GitHub Issue:** [Link Issue #17]
+- **Ảnh minh chứng:**
+  ![Bug 17](images/bug17.jpg)
+
+### 18. Bug 18: Lỗi logic cập nhật số lượng sản phẩm (Tự động cộng 1)
+
+- **Mô tả:** Do giao diện thiếu nút "+/-", người dùng phải nhập tay số lượng vào ô input. Nếu nhập số "1" thì bình thường, nhưng nếu nhập bất kỳ số nào khác (Ví dụ nhập "2"), hệ thống tự động nhận diện sai và cộng thêm 1, biến thành "3". Việc này dẫn đến sai lệch nghiêm trọng về số lượng thực tế và giá tiền đơn hàng.
+- **Test Case phát hiện:** `TC_FR-20_03`
+- **GitHub Issue:** [Link Issue #18]
+- **Ảnh minh chứng:**
+  ![Bug 18](images/bug18.jpg)
+
+### 19. Bug 19: Rò rỉ dữ liệu phiên (Session/Data Leak) khi Đăng xuất
+
+- **Mô tả:** Người dùng đăng nhập, thêm sản phẩm vào giỏ hàng, sau đó thực hiện Đăng xuất. Tuy nhiên, dữ liệu giỏ hàng trên máy khách (Client) không được làm sạch (clear). Nếu truy cập lại trang giỏ hàng, sản phẩm của tài khoản cũ vẫn còn hiển thị nguyên vẹn. Điều này gây nguy cơ rò rỉ dữ liệu cá nhân hoặc thanh toán nhầm cho người dùng dùng chung thiết bị.
+- **Test Case phát hiện:** `TC_FR-20_07`
+- **GitHub Issue:** [Link Issue #19]
+- **Ảnh minh chứng:**
+  ![Bug 19](images/bug19.jpg)
