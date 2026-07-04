@@ -160,3 +160,11 @@
 - **GitHub Issue:** [Link Issue #19]
 - **Ảnh minh chứng:**
   ![Bug 19](images/bug19.jpg)
+
+  ### 20. Bug 20: Lỗi Race Condition - Cho phép thanh toán sản phẩm đã bị xóa khỏi hệ thống
+
+- **Mô tả:** Theo đặc tả, hệ thống cần kiểm tra trạng thái sản phẩm trước khi lập đơn hàng. Tuy nhiên, nếu một sản phẩm (Sản phẩm B) đã được thêm vào giỏ hàng, sau đó bị Admin xóa hoàn toàn khỏi hệ thống, sản phẩm này vẫn tiếp tục hiển thị trong giỏ hàng của người dùng. Khi người dùng bấm thanh toán, hệ thống không bắt lỗi "sản phẩm không còn tồn tại" mà vẫn ghi nhận thanh toán thành công.
+- **Test Case phát hiện:** `TC_FR-08_06`
+- **GitHub Issue:** [Link Issue #20]
+- **Ảnh minh chứng:**
+  ![Bug 20](images/bug20.png)

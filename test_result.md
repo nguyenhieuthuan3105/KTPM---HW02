@@ -24,7 +24,7 @@ TC_FR-08_02 Sử dụng UI để sửa tổng tiền thành 0 sau đó bấm tha
 TC_FR-08_03 Sử dụng UI để sửa tổng tiền thành -10 sau đó bấm thanh toán, vẫn hiển thị thanh toán thành công.
 TC_FR-08_04 Sau khi hiển thị thanh toán thành công, có thể bấm reset để cho ra 1 trang thanh toán rỗng không có sản phẩm với tổng tiền 1. Bấm thanh toán lần nữa và vẫn hiển thị thanh toán thành công.
 TC_FR-08_05 Bỏ qua
-TC_FR-08_06 Bỏ qua
+TC_FR-08_06 Trong giỏ hàng vẫn hiển thị sản phẩm B. Tiến hành thanh toán thì vẫn hiện thanh toán thành công.
 TC_FR-08_07 Backend không trả về HTTP Status 401 như kỳ vọng. Thay vào đó, do lỗi cấu hình bảo mật ở Middleware, trình duyệt đã văng lỗi CORS (Cross-Origin Resource Sharing) policy và chặn request.
 TC_FR-08_08 Backend không trả về HTTP Status 401 như kỳ vọng. Thay vào đó, do lỗi cấu hình bảo mật ở Middleware, trình duyệt đã văng lỗi CORS (Cross-Origin Resource Sharing) policy và chặn request.
 TC_FR-08_09 Hệ thống hiển thị thông báo lỗi yêu cầu đăng nhập và chuyển hướng về trang đăng nhập đúng như kỳ vọng.
