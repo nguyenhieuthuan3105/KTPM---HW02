@@ -376,3 +376,55 @@ FR-20: Giỏ hàng (Shopping Cart) trên Mobile.
 ```text
 Tóm tắt ngắn gọn: Agent đã phân tích thành công các miền hợp lệ/không hợp lệ cho thao tác tap và swipe, thiết kế bộ test Domain và BVA bám sát biên số lượng 1/0, đồng thời tạo template Bug Report theo chuẩn GitHub Issue. Lưu ý quan trọng: do đặc tả không nêu ngưỡng tối đa số lượng, phần BVA chỉ kiểm thử biên dưới và các trạng thái chuyển về 0 để tránh tự đặt giới hạn không có trong yêu cầu.
 ```
+
+---
+
+# AI Audit Report
+
+### Sản phẩm 1 (Artifact 1): Phân tích Domain và BVA cho chức năng Đăng nhập (FR-02) và Thanh toán (FR-08)
+
+- **(1) Prompt + Tool:**
+  - **Tool:** Gemini 3.1 Pro
+  - **Thời gian:** 09/06/2026 - 16/06/2026
+  - **Prompt:** `Các yêu cầu phân tích miền giá trị và BVA dựa trên đặc tả hệ thống cho FR-02 và FR-08.`
+- **(2) AI output:** AI sinh ra bảng test case chi tiết nhưng sử dụng sai thông tin tài khoản test (dùng user@example.com thay vì test@eshop.com) và thiếu các cột kết quả thực thi. Ở FR-08, AI tự động tạo các kịch bản kiểm tra tồn kho (stock) và bỏ quên luồng thao tác trên giao diện của Khách vãng lai (Guest).
+- **(3) Kết luận:** CHƯA HOÀN THIỆN (INCOMPLETE) & KHÔNG HỢP LỆ (INVALID)
+- **(4) Lý do:** AI bị "ảo giác" (hallucination) khi tự áp đặt cơ chế tồn kho vốn không có trong hệ thống SUT. Đồng thời, AI thiếu ngữ cảnh về trải nghiệm người dùng (UX) trên trình duyệt nên không thiết kế kịch bản UI cho trường hợp thao tác mà thiếu Token.
+- **(5) Chỉnh sửa:** Sửa lại toàn bộ dữ liệu test data thành test@eshop.com và iPhone 15 Pro Max. Đánh dấu bỏ qua (N/A) các test case liên quan đến tồn kho và tự bổ sung kịch bản kiểm tra chặn thanh toán UI khi chưa đăng nhập.
+
+### Sản phẩm 2 (Artifact 2): Phân tích Domain và BVA cho chức năng Dashboard (FR-13)
+
+- **(1) Prompt + Tool:**
+  - **Tool:** Gemini 3.1 Pro
+  - **Thời gian:** 23/06/2026 - 24/06/2026
+  - **Prompt:** `Yêu cầu thiết kế Bảng Test Case phân tích số lượng đơn hàng và tổng doanh thu, lưu ý bám sát ranh giới khi có lỗi nhân đôi doanh thu (Bug 13).`
+- **(2) AI output:** AI phân tích đúng ranh giới của dữ liệu nhưng lại tự động thêm trạng thái processing vào kịch bản kiểm thử và tự bịa ra các con số tiền tệ ngẫu nhiên như 1.000.000đ, 200.000đ.
+- **(3) Kết luận:** CHƯA HOÀN THIỆN (INCOMPLETE) & KHÔNG HỢP LỆ (INVALID)
+- **(4) Lý do:** AI áp dụng kiến thức chung về các hệ thống E-commerce thực tế thay vì tuân thủ chặt chẽ ranh giới vòng đời trạng thái (State Machine) của hệ thống SUT hiện tại. Việc sinh dữ liệu (Arbitrary Data Generation) không bám vào mock data khiến bài test thiếu tính thực tế.
+- **(5) Chỉnh sửa:** Loại bỏ hoàn toàn trạng thái processing do không hợp lệ. Cập nhật lại toàn bộ test data bằng các con số tiền tệ tính toán chính xác để làm nổi bật tác động của Bug 13 lên nguy cơ tràn số nguyên (Max Int 32-bit).
+
+### Sản phẩm 3 (Artifact 3): Thiết lập và thực thi EShop QA Agent Skill cho Giỏ hàng (FR-20)
+
+- **(1) Prompt + Tool:**
+  - **Tool:** EShop QA Agent Skill (chạy qua Copilot AI Chatbox Auto Model)
+  - **Thời gian:** 29/06/2026
+  - **Prompt:** `Kích hoạt Agent Skill với System Blueprint ép buộc AI dùng đúng định dạng Markdown, không hallucinate tồn kho và chạy luồng BVA cho FR-20.`
+- **(2) AI output:** Tạo ra tài liệu có định dạng cực kỳ chuẩn xác và tạo sẵn Bug Report Template theo chuẩn. Tuy nhiên, về mặt logic, AI vẫn mặc định chức năng giảm số lượng về 0 sẽ tự xóa sản phẩm khỏi giỏ, bỏ qua việc yêu cầu Dialog xác nhận, và không có kịch bản test trạng thái Đăng xuất.
+- **(3) Kết luận:** CHƯA HOÀN THIỆN (INCOMPLETE) & KHÔNG HỢP LỆ (INVALID)
+- **(4) Lý do:** Mặc dù Agent Skill khắc phục hoàn toàn vấn đề định dạng và cấu trúc bảng, bản chất mô hình LLM vẫn phân tích cục bộ trong giới hạn một UI nhỏ bé. Sự thiếu góc nhìn tổng thể về Client-Server đã dẫn đến lỗ hổng bỏ sót việc Session Management.
+- **(5) Chỉnh sửa:** Tôi trực tiếp thiết kế thêm Test Case 07 để kiểm thử quản lý phiên, qua đó bắt được Bug 19 (Rò rỉ dữ liệu phiên). Cấu trúc lại BVA để kiểm chứng cơ chế chặn số lượng ở mức tối thiểu 1 và cập nhật các Bug 16, 17, 18 liên quan đến UI thực tế vào tài liệu.
+
+### Tổng kết và Kết luận
+
+**1. Tỷ lệ chính xác của AI (AI Accuracy Ratio):**
+Dựa trên các Artifacts trong quá trình thực thi HW02:
+
+- **VALID:** 0% (Chưa có sản phẩm đầu ra nào hoàn hảo 100% để copy-paste trực tiếp mà không sửa đổi).
+- **INVALID:** 30% (Một số chỗ bị sai lệch logic, tự sáng tạo trạng thái và tự thiết kế kịch bản quản lý kho không có thật).
+- **INCOMPLETE:** ~70% (Xây dựng form đúng nhưng thiếu kịch bản biên quan trọng như Race Condition, kiểm soát Session, hoặc xử lý thiếu vắng Token trên UI).
+
+**2. Kết luận:**
+Qua quá trình hợp tác và kiểm toán công cụ Gemini 3.1 Pro và Copilot, tôi rút ra nguyên tắc sử dụng AI trong công việc QA/QC như sau:
+
+- **KHI NÀO NÊN DÙNG AI:** Sử dụng AI hiệu quả nhất thông qua việc thiết lập các Agent Skill (System Instructions) để tạo bộ khung (templates) kiểm thử, chuẩn hóa bảng biểu báo cáo, và tư duy nhanh các kịch bản luồng chuẩn (Happy Path).
+- **KHI NÀO KHÔNG NÊN DÙNG AI:** Không tin tưởng hoàn toàn vào khả năng phân tích các tính năng có tính liên kết chặt chẽ tới biến ẩn (ví dụ: Session, Authentication) của AI. Tuyệt đối không để AI tự quyết định logic hệ thống (như tự thêm tồn kho) mà không đối chiếu tài liệu đặc tả. Sự kiểm soát thủ công (Human-in-the-loop) là bắt buộc để tìm ra những lỗi ẩn sâu như Race Condition hay Memory Leak.

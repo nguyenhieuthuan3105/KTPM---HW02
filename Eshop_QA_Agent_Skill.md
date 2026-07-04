@@ -32,9 +32,9 @@ Toàn bộ nội dung phải được viết 100% bằng TIẾNG VIỆT. Dưới
 
 **Thiết kế Test Case (Domain Testing)**
 (Sinh bảng test case phủ các miền giá trị trên. Cột ID có format `TC_FR-XX_01`).
-| Test Case ID | Tên (Test Objective) | Đầu vào & Trạng thái (Test Data) | Kết quả mong đợi (Expected Result) | Kết quả thực tế (Actual Result) | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| (Data) | (Data) | (Sử dụng `<br>` để ngắt dòng) | (Data) | | N/A |
+| Test Case ID | Tên (Test Objective) | Đầu vào & Trạng thái (Test Data) | Thực hiện (Test step) | Kết quả mong đợi (Expected Result) | Kết quả thực tế (Actual Result) | Verdict |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| (Data) | (Data) | (Chỉ cần tóm gọn cần làm gì) | (Sử dụng `<br>` để ngắt dòng) | (Data) | | N/A |
 
 ### Boundary Value Analysis (BVA)
 
@@ -43,9 +43,9 @@ Toàn bộ nội dung phải được viết 100% bằng TIẾNG VIỆT. Dưới
 
 **Thiết kế Test Case (BVA Testing):**
 (Sinh bảng test case BVA tương ứng. Cột ID có format `TC_FR-XX_BVA_01`).
-| Test Case ID | Tên (Test Objective) | Đầu vào & Trạng thái (Test Data) | Kết quả mong đợi (Expected Result) | Kết quả thực tế (Actual Result) | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| (Data) | (Data) | (Sử dụng `<br>` để ngắt dòng) | (Data) | | N/A |
+| Test Case ID | Tên (Test Objective) | Đầu vào & Trạng thái (Test Data) | Thực hiện (Test step) | Kết quả mong đợi (Expected Result) | Kết quả thực tế (Actual Result) | Verdict |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| (Data) | (Data) | (Chỉ cần tóm gọn cần làm gì) | (Sử dụng `<br>` để ngắt dòng) | (Data) | | N/A |
 
 ### AI Gap Analysis
 
@@ -61,17 +61,17 @@ Toàn bộ danh sách lỗi phát hiện được từ các Test Case trên đã
 
 [File: FR-XX_Bug_Report.md]
 
-_(Đây là template để người dùng copy và điền khi phát hiện bug trong lúc thực thi)_
+_(Đây là template để copy và điền khi phát hiện bug trong lúc thực thi)_
 
 ### [Số thứ tự]. Bug [Số thứ tự]: [Điền Tiêu đề lỗi ngắn gọn]
 
-- **Mô tả:** [Người dùng tự điền mô tả chi tiết lỗi quan sát được]
+- **Mô tả:** [Tự điền mô tả chi tiết lỗi quan sát được]
 - **Test Case phát hiện:** `[Điền mã TC phát hiện lỗi]`
 - **GitHub Issue:** [Link Issue #...]
 - **Ảnh minh chứng:**
   ![Bug Image](images/bug_frXX.png)
 
-_(Đây là template để người dùng copy và log bug lên github issue)_
+_(Đây là template để copy và log bug lên github issue)_
 
 - Sinh sẵn 1 template Bug Report theo chuẩn GitHub Issue để User có thể dùng ngay nếu phát hiện lỗi trong quá trình thực thi test.
 - Bao gồm: Tiêu đề, Mô tả lỗi, Bước tái hiện, Kết quả mong đợi, Kết quả thực tế, Test Case liên quan, Ảnh minh chứng.
