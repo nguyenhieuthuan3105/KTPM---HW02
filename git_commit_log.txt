@@ -1,0 +1,172 @@
+* commit a8c566492d32b2dcbd29c6d20a262e94fdf5dedd
+| Author: Ruby <nhthuan23@clc.fitus.edu.vn>
+| Date:   Sun Jul 5 22:59:12 2026 +0700
+| 
+|     docs: finalize readme.md and eshop_qa_agent_skill
+| 
+|  Eshop_QA_Agent_Skill.md | 18 ++++++++---------
+|  README.md               | 51 ++++++++++++++++++++++++++++++++++++++++++++++-
+|  2 files changed, 59 insertions(+), 10 deletions(-)
+| 
+* commit b3faef24e3b224d6de6bd802c3ac576949522e6b
+| Author: Ruby <nhthuan23@clc.fitus.edu.vn>
+| Date:   Sat Jul 4 16:30:52 2026 +0700
+| 
+|     docs: complete file AI_Critique and AI_Audit_Report. Add link to Bug_Report.
+| 
+|  AI_Audit_Report.md      | 52 +++++++++++++++++++++++++++++++++++++++++++++++
+|  AI_Critique.md          | 14 ++++++++++++-
+|  Bug_Report.md           | 40 ++++++++++++++++++------------------
+|  Eshop_QA_Agent_Skill.md | 18 ++++++++--------
+|  4 files changed, 94 insertions(+), 30 deletions(-)
+| 
+* commit d1d5b48547c174fb4b72534d11555755fdad08a1
+| Author: Ruby <nhthuan23@clc.fitus.edu.vn>
+| Date:   Sat Jul 4 15:29:11 2026 +0700
+| 
+|     docs: change test case format. Log bug 20.
+| 
+|  Bug_Report.md    |   8 +++
+|  Main_Report.md   | 140 ++++++++++++++++++++++++++---------------------------
+|  SkillUsing.md    |  25 ----------
+|  images/bug20.png | Bin 0 -> 193108 bytes
+|  test_result.md   |   2 +-
+|  5 files changed, 79 insertions(+), 96 deletions(-)
+| 
+* commit c50f519a6373944caa4d6ddf61c2db52d6da87f5
+| Author: Ruby <nhthuan23@clc.fitus.edu.vn>
+| Date:   Wed Jul 1 10:47:19 2026 +0700
+| 
+|     docs: create EShop QA Agent Skill, complete domain & BVA testing for FR-20, and log bugs 16-19
+| 
+|  AI_Audit_Report.md      |  74 ++++++++++++++++++++++-----------
+|  Bug_Report.md           |  32 +++++++++++++++
+|  Eshop_QA_Agent_Skill.md | 101 ++++++++++++++++++++++++++++++++++++++++++++++
+|  Main_Report.md          |  96 +++++++++++++++++++++++++++++++++++++++++++
+|  SkillUsing.md           |  25 ++++++++++++
+|  images/bug16.jpg        | Bin 0 -> 213332 bytes
+|  images/bug17.jpg        | Bin 0 -> 134905 bytes
+|  images/bug18.jpg        | Bin 0 -> 486100 bytes
+|  images/bug19.jpg        | Bin 0 -> 272286 bytes
+|  test_result.md          |  19 +++++++++
+|  10 files changed, 324 insertions(+), 23 deletions(-)
+| 
+* commit 8c183a4766e399ae73f09c37ed31bddf5d619ef2
+| Author: Ruby <nhthuan23@clc.fitus.edu.vn>
+| Date:   Thu Jun 25 20:36:59 2026 +0700
+| 
+|     docs: log bugs 14 and 15 regarding responsive UI in Dashboard. complete FR-13
+| 
+|  AI_Audit_Report.md |  61 +++++++++++++++++++++++++++++++++++++++++++++++++++
+|  Bug_Report.md      |  16 ++++++++++++++
+|  Main_Report.md     |  45 ++++++++++++++++++++++++++++++++++++-
+|  images/bug14.png   | Bin 0 -> 156861 bytes
+|  images/bug15.png   | Bin 0 -> 186950 bytes
+|  test_result.md     |   7 ++++++
+|  6 files changed, 128 insertions(+), 1 deletion(-)
+| 
+* commit ec2c07875dd0f4051504841a293ac1ec1d518ce7
+| Author: Ruby <nhthuan23@clc.fitus.edu.vn>
+| Date:   Tue Jun 23 20:30:28 2026 +0700
+| 
+|     docs: update domain test results for FR-13 and log Bug 13
+| 
+|  AI_Audit_Report.md |  66 +++++++++++++++++++++++++++++++++++++++++++++++++++
+|  Bug_Report.md      |   8 +++++++
+|  Main_Report.md     |  64 +++++++++++++++++++++++++++++++++++++++++++++++++
+|  images/bug13.png   | Bin 0 -> 86608 bytes
+|  test_result.md     |   9 +++++++
+|  5 files changed, 147 insertions(+)
+| 
+* commit d8646801fddd62806f9a5364e0a9541cad95e738
+| Author: Ruby <nhthuan23@clc.fitus.edu.vn>
+| Date:   Mon Jun 22 15:40:28 2026 +0700
+| 
+|     docs: finalize BVA test cases for FR-08 and log Bug 12
+| 
+|  AI_Audit_Report.md |  26 ++++++++++++++++++++++++++
+|  Bug_Report.md      |   8 ++++++++
+|  Main_Report.md     |  25 +++++++++++++++++++++++++
+|  images/bug12.png   | Bin 0 -> 94419 bytes
+|  test_result.md     |   6 ++++++
+|  5 files changed, 65 insertions(+)
+| 
+* commit 96573a5140342f48cd288e9dccb351eceb613a33
+| Author: Ruby <nhthuan23@clc.fitus.edu.vn>
+| Date:   Mon Jun 22 15:04:19 2026 +0700
+| 
+|     docs: update domain test results for FR-08 and log bugs 6-11
+| 
+|  AI_Audit_Report.md |  35 ++++++++++++++++++++-
+|  Bug_Report.md      |  48 ++++++++++++++++++++++++++++
+|  Main_Report.md     |  86 ++++++++++++++++++++++++++++++++++++++++++++++++---
+|  images/bug10.png   | Bin 0 -> 182034 bytes
+|  images/bug11.png   | Bin 0 -> 198273 bytes
+|  images/bug6.png    | Bin 0 -> 104712 bytes
+|  images/bug7.png    | Bin 0 -> 107890 bytes
+|  images/bug8.png    | Bin 0 -> 110912 bytes
+|  images/bug9.png    | Bin 0 -> 99900 bytes
+|  test_result.md     |  14 +++++++++
+|  10 files changed, 178 insertions(+), 5 deletions(-)
+| 
+* commit 104978b7d32e6735eaf92af4849d2a4d25287b26
+| Author: Ruby <nhthuan23@clc.fitus.edu.vn>
+| Date:   Mon Jun 15 19:23:59 2026 +0700
+| 
+|     fix: find a mising bug in FR-02. Recheck all the file and edit the related content.
+| 
+|  Bug_Report.md   |   8 ++++++++
+|  Main_Report.md  |  18 +++++++++---------
+|  images/bug5.png | Bin 0 -> 92501 bytes
+|  test_result.md  |   7 +++----
+|  4 files changed, 20 insertions(+), 13 deletions(-)
+| 
+* commit 912a470291d0c3a25bd465ff297c2843c1444ac3
+| Author: Ruby <nhthuan23@clc.fitus.edu.vn>
+| Date:   Mon Jun 15 10:53:01 2026 +0700
+| 
+|     docs: finalize BVA actual results, AI Gap Analysis and Bug Reporting for FR-02
+| 
+|  AI_Audit_Report.md |  46 ++++++++++++++++++++++++++++++++++++++++++
+|  Bug_Report.md      |  43 +++++++++++++++++++++++++++++++++++++++-
+|  Main_Report.md     |  55 +++++++++++++++++++++++++++++++++------------------
+|  images/bug1.png    | Bin 0 -> 96395 bytes
+|  images/bug2.png    | Bin 0 -> 96890 bytes
+|  images/bug3.png    | Bin 0 -> 96942 bytes
+|  images/bug4.png    | Bin 0 -> 95644 bytes
+|  test_result.md     |  17 ++++++++++++++++
+|  8 files changed, 141 insertions(+), 20 deletions(-)
+| 
+* commit 82f1cefb26ca90a3bd1f601116c42d7a3008e034
+| Author: Ruby <nhthuan23@clc.fitus.edu.vn>
+| Date:   Wed Jun 10 21:14:22 2026 +0700
+| 
+|     docs(FR-02): complete BVA test cases
+| 
+|  AI_Audit_Report.md | 38 ++++++++++++++++++++++++++++++++++++++
+|  Main_Report.md     | 27 +++++++++++++++++++++++++++
+|  2 files changed, 65 insertions(+)
+| 
+* commit 6326f276768680deefa7e61292963550f8a30855
+| Author: Ruby <nhthuan23@clc.fitus.edu.vn>
+| Date:   Wed Jun 10 10:43:41 2026 +0700
+| 
+|     docs: complete Domain Testing analysis and test cases for FR-02
+| 
+|  AI_Audit_Report.md | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+|  AI_Critique.md     |  1 +
+|  Bug_Report.md      |  1 +
+|  Main_Report.md     | 67 +++++++++++++++++++++++++++++++++++++++++++
+|  README.md          |  1 +
+|  what to do.txt     |  3 +-
+|  6 files changed, 152 insertions(+), 1 deletion(-)
+| 
+* commit 10a3ddad62546e4fe4576ac93e2b782559d22037
+  Author: Ruby <nhthuan23@clc.fitus.edu.vn>
+  Date:   Mon Jun 8 20:41:04 2026 +0700
+  
+      Initial commit.
+  
+   2026.HW02.Domain Testing_En.pdf | Bin 0 -> 403870 bytes
+   what to do.txt                  |  77 ++++++++++++++++++++++++++++++++++++++
+   2 files changed, 77 insertions(+)
