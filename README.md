@@ -19,7 +19,12 @@ Dưới đây là thống kê tổng quan về quá trình kiểm thử áp dụ
 - **Tổng số Test Cases Failed:** 31
 - **Tổng số lỗi (Bugs) phát hiện được:** 20 Bugs _(Đã log chi tiết trên GitHub Issues)_
 
-## 2. Agent Skill Demonstration
+## 2. Project Repositories
+
+- **Group Issues Tracker (Log Bugs):** [LINK GITHUB LOG BUGS](https://github.com/nguyenhieuthuan3105/EShop-Testing-HW02-Group04/issues)
+- **Personal Workspace:** [LINK GITHUB](https://github.com/nguyenhieuthuan3105/KTPM---HW02)
+
+## 3. Agent Skill Demonstration
 
 - **Agent Skill:** Được thiết kế để tự động hóa luồng phân tích Domain Testing, BVA, kiểm soát Hallucination của AI và chuẩn hóa form báo cáo Markdown.
 - **YouTube Demo Link:** [LINK YOUTUBE](https://youtu.be/H9EO3nrwjNE)
@@ -36,7 +41,7 @@ Dưới đây là thống kê tổng quan về quá trình kiểm thử áp dụ
 > - [Copy trực tiếp nội dung đặc tả cần phân tích và tạo testcase vào đây]
 > - ...
 
-## 3. Self-Assessment Table
+## 4. Self-Assessment Table
 
 Căn cứ vào khối lượng công việc, chất lượng phân tích (bắt được các bug sâu như Race Condition, Tràn số) và việc xây dựng thành công Agent Skill, tôi tự đánh giá điểm số như sau:
 

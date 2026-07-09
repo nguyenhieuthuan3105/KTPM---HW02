@@ -3,7 +3,7 @@
 **MSSV:** 23127125 </br>
 **Họ và tên:** Nguyễn Hiếu Thuận </br>
 **Bài tập:** HW02 - Domain Testing </br>
-**Chức năng:** FR-02 (Đăng nhập & Khóa tài khoản)
+**Chức năng:** FR-02, FR-08, FR-13, FR-20
 
 ---
 
